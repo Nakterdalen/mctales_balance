@@ -3,9 +3,9 @@
 	"id": "minecraft-tales-balance",
 	"version": "${version}",
 	"name": "Minecraft Tales: Balance",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "A vanilla-friendly mod from the Minecraft Tales series that aims to introduce a bit of balance to the game.",
 	"authors": [
-		"Me!"
+		"Nakterdalen"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
