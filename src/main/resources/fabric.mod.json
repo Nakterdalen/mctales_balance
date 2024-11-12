@@ -37,5 +37,9 @@
 	},
 	"suggests": {
 		"another-mod": "*"
-	}
+	},
+	"helpers": [
+		"The...Why...Even...How? (Discord)",
+		"KaupenJoe (Youtube)"
+	]
 }
