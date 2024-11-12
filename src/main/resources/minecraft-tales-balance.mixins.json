@@ -1,11 +1,12 @@
 {
-	"required": true,
-	"package": "nakterdalen.mctales.balance.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ExampleMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "nakterdalen.mctales.balance.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ExampleMixin",
+    "ToolMaterialMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }
