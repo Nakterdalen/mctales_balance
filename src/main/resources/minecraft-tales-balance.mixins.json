@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ExampleMixin",
-    "ToolMaterialMixin"
+    "gearprogressionmixins.ToolMaterialMixin",
+    "gearprogressionmixins.DeepslateHardnessMixin"
   ],
   "injectors": {
     "defaultRequire": 1
