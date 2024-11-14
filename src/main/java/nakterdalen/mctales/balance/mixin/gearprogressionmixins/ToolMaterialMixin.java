@@ -33,7 +33,7 @@ public abstract class ToolMaterialMixin {
     // Change Diamond
     @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "Lnet/minecraft/item/ToolMaterial;", ordinal = 3))
     private static ToolMaterial newDiamondStats(TagKey<Block> noDropTag, int durability, float speed, float attackBonus, int enchantValue, TagKey<Item> repairItems, Operation<ToolMaterial> original) {
-        return original.call(noDropTag, 2820, 35.0f, attackBonus, enchantValue, repairItems);
+        return original.call(noDropTag, 2820, 35.0f, 4.0f, enchantValue, repairItems);
     }
 
     // Change Gold
@@ -45,6 +45,6 @@ public abstract class ToolMaterialMixin {
     // Change Netherite
     @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "Lnet/minecraft/item/ToolMaterial;", ordinal = 5))
     private static ToolMaterial newNetheriteStats(TagKey<Block> noDropTag, int durability, float speed, float attackBonus, int enchantValue, TagKey<Item> repairItems, Operation<ToolMaterial> original) {
-        return original.call(noDropTag, 1584, 28.0f, attackBonus, enchantValue, repairItems);
+        return original.call(noDropTag, 1584, 28.0f, 3.0f, enchantValue, repairItems);
     }
 }
