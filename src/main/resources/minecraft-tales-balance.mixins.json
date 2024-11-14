@@ -5,6 +5,7 @@
   "mixins": [
     "ExampleMixin",
     "anvilmixins.anvilBalanceMixin",
+    "anvilmixins.ItemMaterialMixin",
     "gearprogressionmixins.DeepslateHardnessMixin",
     "gearprogressionmixins.ToolMaterialMixin"
   ],

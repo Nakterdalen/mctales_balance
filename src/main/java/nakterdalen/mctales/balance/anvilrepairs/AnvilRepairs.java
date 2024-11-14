@@ -34,7 +34,7 @@ public class AnvilRepairs {
             return currentDamage - (stack.getMaxDamage()/5);
         }
 
-        // Chestplates
+        // Chest plates
         if (stack.isIn(ItemTags.CHEST_ARMOR)) {
             return currentDamage - (stack.getMaxDamage()/8);
         }
