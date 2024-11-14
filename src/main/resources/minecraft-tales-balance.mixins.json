@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "ExampleMixin",
-    "anvilmixins.anvilLevelMixin",
+    "anvilmixins.anvilBalanceMixin",
     "gearprogressionmixins.DeepslateHardnessMixin",
     "gearprogressionmixins.ToolMaterialMixin"
   ],
