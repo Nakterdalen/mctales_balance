@@ -1,5 +1,6 @@
 package nakterdalen.mctales.balance.mixin.anvilmixins;
 
+import nakterdalen.mctales.balance.anvilrepairs.AnvilRepairs;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -15,12 +16,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Objects;
 
 @Mixin(AnvilScreenHandler.class)
-public abstract class anvilLevelMixin extends ForgingScreenHandler {
+public abstract class anvilBalanceMixin extends ForgingScreenHandler {
 
     @Final
     @Shadow
@@ -31,27 +33,28 @@ public abstract class anvilLevelMixin extends ForgingScreenHandler {
     @Shadow @Nullable private String newItemName;
 
     //will be ignored
-    public anvilLevelMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
+    public anvilBalanceMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
         super(type, syncId, playerInventory, context, forgingSlotsManager);
+    }
+
+    @Redirect(method = "updateResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;setDamage(I)V", ordinal = 0))
+    private void changeDurability(ItemStack instance, int damage) {
+        instance.setDamage(AnvilRepairs.getRepairDurability(instance));
     }
 
     @Inject(method = "updateResult", at = @At("TAIL"))
     private void changeAmount(CallbackInfo ci){
         ItemStack inputItem = input.getStack(0);
-        if (inputItem.isEmpty()) {
+        ItemStack outputItem = output.getStack(0);
+        if (outputItem.isEmpty()) {
             return;
         }
         int xpCost = 0;
-        for (RegistryEntry<Enchantment> entry : EnchantmentHelper.getEnchantments(inputItem).getEnchantments()) {
-            xpCost += EnchantmentHelper.getLevel(entry, inputItem);
+        for (RegistryEntry<Enchantment> entry : EnchantmentHelper.getEnchantments(outputItem).getEnchantments()) {
+            xpCost += EnchantmentHelper.getLevel(entry, outputItem);
         }
-        ItemStack inputItem2 = input.getStack(1);
-        if (!inputItem2.isEmpty()) {
-            for (RegistryEntry<Enchantment> entry : EnchantmentHelper.getEnchantments(inputItem2).getEnchantments()) {
-                xpCost += EnchantmentHelper.getLevel(entry, inputItem2);
-            }
-        }
-        levelCost.set(xpCost);
+        int squaredXPCost = xpCost*xpCost;
+        levelCost.set(squaredXPCost);
         inputItem.set(DataComponentTypes.REPAIR_COST, 0);
     }
 
