@@ -6,6 +6,8 @@
     "ExampleMixin",
     "anvilmixins.anvilBalanceMixin",
     "anvilmixins.ItemMaterialMixin",
+    "armormixins.ArmorStatMixin",
+    "armormixins.EquipTypeMixin",
     "enchantingmixins.MendingMixin",
     "gearprogressionmixins.DeepslateHardnessMixin",
     "gearprogressionmixins.ToolMaterialMixin"
