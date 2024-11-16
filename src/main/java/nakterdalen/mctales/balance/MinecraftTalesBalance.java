@@ -1,6 +1,5 @@
 package nakterdalen.mctales.balance;
 
-import nakterdalen.mctales.balance.armor.ArmorWeight;
 import nakterdalen.mctales.balance.armor.WeightEvents;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
@@ -19,8 +18,6 @@ public class MinecraftTalesBalance implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-
-		ArmorWeight.registerWeightAttribute();
 		WeightEvents.registerWeightEvents();
 
 		LOGGER.info("Hello balanced world!");

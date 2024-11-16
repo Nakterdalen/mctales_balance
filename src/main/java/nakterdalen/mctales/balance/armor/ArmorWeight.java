@@ -1,25 +1,14 @@
 package nakterdalen.mctales.balance.armor;
 
-import nakterdalen.mctales.balance.MinecraftTalesBalance;
-import net.minecraft.entity.attribute.ClampedEntityAttribute;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.item.equipment.EquipmentType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class ArmorWeight {
 
-    public static final Identifier WEIGHT_ID = Identifier.of(MinecraftTalesBalance.MOD_ID, "armor_weight");
     public static final Map<Item, Integer> WEIGHT_MAP = new HashMap<>();
-    private static final double TRANSFER_RATE = 0.02;
-    public static final EntityAttribute WEIGHT_ATTRIBUTE = (new ClampedEntityAttribute("attribute.weight.armor", 0.0, 0.0, 50.0).setTracked(true));
+    public static final double TRANSFER_RATE = 0.02;
 
     static {
         //Leather
@@ -61,9 +50,5 @@ public class ArmorWeight {
             return -WEIGHT_MAP.get(item)*TRANSFER_RATE;
         }
         return 0;
-    }
-
-    public static void registerWeightAttribute() {
-        Registry.register(Registries.ATTRIBUTE, WEIGHT_ID, WEIGHT_ATTRIBUTE);
     }
 }
