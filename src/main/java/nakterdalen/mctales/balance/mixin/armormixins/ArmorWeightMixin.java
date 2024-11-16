@@ -3,7 +3,7 @@ package nakterdalen.mctales.balance.mixin.armormixins;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import nakterdalen.mctales.balance.MinecraftTalesBalance;
-import nakterdalen.mctales.balance.armor.ArmorStats;
+import nakterdalen.mctales.balance.armor.ArmorWeight;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -22,7 +22,7 @@ public class ArmorWeightMixin {
         Identifier identifier = Identifier.of(MinecraftTalesBalance.MOD_ID, "weight." + equipmentType.getName());
         AttributeModifierSlot attributeModifierSlot = AttributeModifierSlot.forEquipmentSlot(equipmentType.getEquipmentSlot());
         return instance.add(EntityAttributes.MOVEMENT_SPEED,
-                new EntityAttributeModifier(identifier, ArmorStats.getAppropriateWeight(equipmentType, (ArmorMaterial) (Object)this), EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                new EntityAttributeModifier(identifier, ArmorWeight.getAppropriateWeight(equipmentType, (ArmorMaterial) (Object)this), EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                 attributeModifierSlot).build();
     }
 }

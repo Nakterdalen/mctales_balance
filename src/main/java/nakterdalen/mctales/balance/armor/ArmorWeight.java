@@ -8,7 +8,7 @@ import net.minecraft.util.Util;
 import java.util.EnumMap;
 import java.util.Map;
 
-public enum ArmorStats{
+public enum ArmorWeight {
     DEFAULT(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 0);
         map.put(EquipmentType.LEGGINGS, 0);
@@ -68,7 +68,7 @@ public enum ArmorStats{
 
     private final Map<EquipmentType, Integer> weight;
 
-    ArmorStats(Map<EquipmentType, Integer> weight) {
+    ArmorWeight(Map<EquipmentType, Integer> weight) {
         this.weight = weight;
     }
 
@@ -80,7 +80,7 @@ public enum ArmorStats{
         return transformWeight(getMaterial(material).weight.get(type));
     }
 
-    private static ArmorStats getMaterial(ArmorMaterial material) {
+    private static ArmorWeight getMaterial(ArmorMaterial material) {
         if (material.equals(ArmorMaterials.LEATHER)) {
             return LEATHER;
         } else if (material.equals(ArmorMaterials.CHAIN)) {
