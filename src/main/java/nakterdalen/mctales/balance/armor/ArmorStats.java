@@ -1,66 +1,64 @@
 package nakterdalen.mctales.balance.armor;
 
-import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.item.equipment.ArmorMaterial;
 import net.minecraft.item.equipment.ArmorMaterials;
 import net.minecraft.item.equipment.EquipmentType;
-import net.minecraft.util.Arm;
 import net.minecraft.util.Util;
 
 import java.util.EnumMap;
 import java.util.Map;
 
 public enum ArmorStats{
-    DEFAULT(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    DEFAULT(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 0);
         map.put(EquipmentType.LEGGINGS, 0);
         map.put(EquipmentType.CHESTPLATE, 0);
         map.put(EquipmentType.HELMET, 0);
         map.put(EquipmentType.BODY, 0);
     })),
-    LEATHER(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    LEATHER(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 0);
         map.put(EquipmentType.LEGGINGS, 0);
         map.put(EquipmentType.CHESTPLATE, 1);
         map.put(EquipmentType.HELMET, 0);
         map.put(EquipmentType.BODY, 0);
     })),
-    CHAIN(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    CHAIN(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 1);
         map.put(EquipmentType.LEGGINGS, 1);
         map.put(EquipmentType.CHESTPLATE, 2);
         map.put(EquipmentType.HELMET, 1);
         map.put(EquipmentType.BODY, 0);
     })),
-    IRON(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    IRON(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 1);
         map.put(EquipmentType.LEGGINGS, 3);
         map.put(EquipmentType.CHESTPLATE,4);
         map.put(EquipmentType.HELMET, 2);
         map.put(EquipmentType.BODY, 0);
     })),
-    NETHERITE(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    NETHERITE(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 1);
         map.put(EquipmentType.LEGGINGS, 3);
         map.put(EquipmentType.CHESTPLATE, 4);
         map.put(EquipmentType.HELMET, 2);
         map.put(EquipmentType.BODY, 0);
     })),
-    DIAMOND(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    DIAMOND(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 1);
         map.put(EquipmentType.LEGGINGS, 2);
         map.put(EquipmentType.CHESTPLATE, 2);
         map.put(EquipmentType.HELMET, 1);
         map.put(EquipmentType.BODY, 0);
     })),
-    GOLD(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    GOLD(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 3);
         map.put(EquipmentType.LEGGINGS,4);
         map.put(EquipmentType.CHESTPLATE, 5);
         map.put(EquipmentType.HELMET,3);
         map.put(EquipmentType.BODY, 0);
     })),
-    TURTLE(Util.make(new EnumMap(EquipmentType.class), (map) -> {
+    TURTLE(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
         map.put(EquipmentType.BOOTS, 0);
         map.put(EquipmentType.LEGGINGS, 0);
         map.put(EquipmentType.CHESTPLATE, 0);
@@ -68,7 +66,7 @@ public enum ArmorStats{
         map.put(EquipmentType.BODY, 0);
     }));
 
-    private Map<EquipmentType, Integer> weight;
+    private final Map<EquipmentType, Integer> weight;
 
     ArmorStats(Map<EquipmentType, Integer> weight) {
         this.weight = weight;
