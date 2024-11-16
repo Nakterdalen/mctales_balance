@@ -1,105 +1,69 @@
 package nakterdalen.mctales.balance.armor;
 
-import net.minecraft.item.equipment.ArmorMaterial;
-import net.minecraft.item.equipment.ArmorMaterials;
+import nakterdalen.mctales.balance.MinecraftTalesBalance;
+import net.minecraft.entity.attribute.ClampedEntityAttribute;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.item.equipment.EquipmentType;
-import net.minecraft.util.Util;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
-public enum ArmorWeight {
-    DEFAULT(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 0);
-        map.put(EquipmentType.LEGGINGS, 0);
-        map.put(EquipmentType.CHESTPLATE, 0);
-        map.put(EquipmentType.HELMET, 0);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    LEATHER(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 0);
-        map.put(EquipmentType.LEGGINGS, 0);
-        map.put(EquipmentType.CHESTPLATE, 1);
-        map.put(EquipmentType.HELMET, 0);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    CHAIN(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 1);
-        map.put(EquipmentType.LEGGINGS, 1);
-        map.put(EquipmentType.CHESTPLATE, 2);
-        map.put(EquipmentType.HELMET, 1);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    IRON(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 1);
-        map.put(EquipmentType.LEGGINGS, 3);
-        map.put(EquipmentType.CHESTPLATE,4);
-        map.put(EquipmentType.HELMET, 2);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    NETHERITE(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 1);
-        map.put(EquipmentType.LEGGINGS, 3);
-        map.put(EquipmentType.CHESTPLATE, 4);
-        map.put(EquipmentType.HELMET, 2);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    DIAMOND(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 1);
-        map.put(EquipmentType.LEGGINGS, 2);
-        map.put(EquipmentType.CHESTPLATE, 2);
-        map.put(EquipmentType.HELMET, 1);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    GOLD(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 3);
-        map.put(EquipmentType.LEGGINGS,4);
-        map.put(EquipmentType.CHESTPLATE, 5);
-        map.put(EquipmentType.HELMET,3);
-        map.put(EquipmentType.BODY, 0);
-    })),
-    TURTLE(Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
-        map.put(EquipmentType.BOOTS, 0);
-        map.put(EquipmentType.LEGGINGS, 0);
-        map.put(EquipmentType.CHESTPLATE, 0);
-        map.put(EquipmentType.HELMET, 1);
-        map.put(EquipmentType.BODY, 0);
-    }));
+public class ArmorWeight {
 
-    private final Map<EquipmentType, Integer> weight;
-
-    ArmorWeight(Map<EquipmentType, Integer> weight) {
-        this.weight = weight;
-    }
-
+    public static final Identifier WEIGHT_ID = Identifier.of(MinecraftTalesBalance.MOD_ID, "armor_weight");
+    public static final Map<Item, Integer> WEIGHT_MAP = new HashMap<>();
     private static final double TRANSFER_RATE = 0.02;
+    public static final EntityAttribute WEIGHT_ATTRIBUTE = (new ClampedEntityAttribute("attribute.weight.armor", 0.0, 0.0, 50.0).setTracked(true));
 
-
-    public static double getAppropriateWeight(EquipmentType type, ArmorMaterial material) {
-        assert getMaterial(material) != null;
-        return transformWeight(getMaterial(material).weight.get(type));
+    static {
+        //Leather
+        WEIGHT_MAP.put(Items.LEATHER_BOOTS, 0);
+        WEIGHT_MAP.put(Items.LEATHER_LEGGINGS, 0);
+        WEIGHT_MAP.put(Items.LEATHER_CHESTPLATE, 1);
+        WEIGHT_MAP.put(Items.LEATHER_HELMET, 0);
+        //Chain
+        WEIGHT_MAP.put(Items.CHAINMAIL_BOOTS, 1);
+        WEIGHT_MAP.put(Items.CHAINMAIL_LEGGINGS, 1);
+        WEIGHT_MAP.put(Items.CHAINMAIL_CHESTPLATE, 2);
+        WEIGHT_MAP.put(Items.CHAINMAIL_HELMET, 1);
+        //Iron
+        WEIGHT_MAP.put(Items.IRON_BOOTS, 1);
+        WEIGHT_MAP.put(Items.IRON_LEGGINGS, 3);
+        WEIGHT_MAP.put(Items.IRON_CHESTPLATE, 4);
+        WEIGHT_MAP.put(Items.IRON_HELMET, 2);
+        //Netherite
+        WEIGHT_MAP.put(Items.NETHERITE_BOOTS, 1);
+        WEIGHT_MAP.put(Items.NETHERITE_LEGGINGS, 3);
+        WEIGHT_MAP.put(Items.NETHERITE_CHESTPLATE, 4);
+        WEIGHT_MAP.put(Items.NETHERITE_HELMET, 2);
+        //Diamond
+        WEIGHT_MAP.put(Items.DIAMOND_BOOTS, 1);
+        WEIGHT_MAP.put(Items.DIAMOND_LEGGINGS, 2);
+        WEIGHT_MAP.put(Items.DIAMOND_CHESTPLATE, 2);
+        WEIGHT_MAP.put(Items.DIAMOND_HELMET, 1);
+        //Gold
+        WEIGHT_MAP.put(Items.GOLDEN_BOOTS, 3);
+        WEIGHT_MAP.put(Items.GOLDEN_LEGGINGS, 4);
+        WEIGHT_MAP.put(Items.GOLDEN_CHESTPLATE, 5);
+        WEIGHT_MAP.put(Items.GOLDEN_HELMET, 3);
+        //Turtle
+        WEIGHT_MAP.put(Items.TURTLE_HELMET, 1);
     }
 
-    private static ArmorWeight getMaterial(ArmorMaterial material) {
-        if (material.equals(ArmorMaterials.LEATHER)) {
-            return LEATHER;
-        } else if (material.equals(ArmorMaterials.CHAIN)) {
-            return CHAIN;
-        } else if (material.equals(ArmorMaterials.IRON)) {
-            return IRON;
-        } else if (material.equals(ArmorMaterials.NETHERITE)) {
-            return NETHERITE;
-        } else if (material.equals(ArmorMaterials.DIAMOND)) {
-            return DIAMOND;
-        } else if (material.equals(ArmorMaterials.GOLD)) {
-            return GOLD;
-        } else if (material.equals(ArmorMaterials.TURTLE_SCUTE)) {
-            return TURTLE;
+    public static double getArmorWeight(Item item) {
+        if (WEIGHT_MAP.containsKey(item)) {
+            return -WEIGHT_MAP.get(item)*TRANSFER_RATE;
         }
-        return DEFAULT;
+        return 0;
     }
 
-    private static double transformWeight(int weight) {
-        return weight*-TRANSFER_RATE;
+    public static void registerWeightAttribute() {
+        Registry.register(Registries.ATTRIBUTE, WEIGHT_ID, WEIGHT_ATTRIBUTE);
     }
 }
