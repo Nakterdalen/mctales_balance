@@ -3,7 +3,6 @@
   "package": "nakterdalen.mctales.balance.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ExampleMixin",
     "anvilmixins.anvilBalanceMixin",
     "anvilmixins.ItemMaterialMixin",
     "armormixins.ArmorStatMixin",
