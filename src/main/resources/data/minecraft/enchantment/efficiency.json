@@ -7,9 +7,13 @@
     "minecraft:attributes": [
       {
         "amount": {
-          "type": "minecraft:levels_squared",
-          "added": 8.0
-        },
+          "type": "minecraft:fraction",
+          "denominator": 0.5,
+          "numerator": {
+            "type": "minecraft:levels_squared",
+            "added": 5.0
+          }
+      },
         "attribute": "minecraft:mining_efficiency",
         "id": "minecraft:enchantment.efficiency",
         "operation": "add_value"

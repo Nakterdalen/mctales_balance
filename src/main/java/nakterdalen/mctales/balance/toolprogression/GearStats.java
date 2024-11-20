@@ -28,12 +28,12 @@ public class GearStats {
         DIAMOND_DURABILITY = 2820;
         GOLD_DURABILITY = 114;
 
-        WOOD_SPEED = 2.5f;
+        WOOD_SPEED = 2.0f;
         STONE_SPEED = 5.0f;
-        IRON_SPEED = 21.0f;
-        NETHERITE_SPEED= 28.0f;
-        DIAMOND_SPEED = 25.0f;
-        GOLD_SPEED = 50.0f;
+        IRON_SPEED = 9.0f;
+        NETHERITE_SPEED= 16.0f;
+        DIAMOND_SPEED = 21.0f;
+        GOLD_SPEED = 32.0f;
 
         NETHERITE_ATTACK = 3.0f;
         DIAMOND_ATTACK = 4.0f;
