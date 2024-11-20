@@ -86,11 +86,11 @@ public class ArmorStats {
 
         LEATHER_DURABILITY = 26;
         CHAIN_DURABILITY = 32;
-        IRON_DURABILITY = 42;
+        IRON_DURABILITY = 46;
         NETHERITE_DURABILITY = 54;
-        DIAMOND_DURABILITY = 74;
+        DIAMOND_DURABILITY = 64;
         GOLD_DURABILITY = 13;
-        TURTLE_DURABILITY = 40;
+        TURTLE_DURABILITY = 32;
 
     }
 
