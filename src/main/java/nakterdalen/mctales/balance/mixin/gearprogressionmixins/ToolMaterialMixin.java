@@ -15,8 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(ToolMaterial.class)
 public abstract class ToolMaterialMixin {
 
-    @Shadow @Final public static ToolMaterial WOOD;
-
     // Change Wood
     @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "Lnet/minecraft/item/ToolMaterial;", ordinal = 0))
     private static ToolMaterial newWoodStats(TagKey<Block> noDropTag, int durability, float speed, float attackBonus, int enchantValue, TagKey<Item> repairItems, Operation<ToolMaterial> original) {
