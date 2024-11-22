@@ -4,12 +4,13 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "anvilmixins.anvilBalanceMixin",
-    "anvilmixins.ItemMaterialMixin",
     "armormixins.ArmorStatMixin",
     "armormixins.EquipTypeMixin",
+    "enchantingmixins.EnchantabilityCapMixin",
     "enchantingmixins.EnchantabilityMixin",
     "enchantingmixins.EnchantingScreenHandlerMixin",
     "enchantingmixins.MendingMixin",
+    "gearprogressionmixins.ItemMaterialMixin",
     "gearprogressionmixins.ToolMaterialMixin"
   ],
   "injectors": {

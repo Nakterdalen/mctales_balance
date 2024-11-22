@@ -1,4 +1,4 @@
-package nakterdalen.mctales.balance.mixin.anvilmixins;
+package nakterdalen.mctales.balance.mixin.gearprogressionmixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
