@@ -1,13 +1,11 @@
 package nakterdalen.mctales.balance.mixin.anvilmixins;
 
 import nakterdalen.mctales.balance.anvilrepairs.AnvilRepairs;
+import nakterdalen.mctales.balance.enchanting.BalancedEnchantmentHelper;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.ForgingSlotsManager;
 import org.jetbrains.annotations.Nullable;
@@ -49,12 +47,11 @@ public abstract class anvilBalanceMixin extends ForgingScreenHandler {
         if (outputItem.isEmpty()) {
             return;
         }
-        int xpCost = 0;
-        for (RegistryEntry<Enchantment> entry : EnchantmentHelper.getEnchantments(outputItem).getEnchantments()) {
-            xpCost += EnchantmentHelper.getLevel(entry, outputItem);
-        }
-        int squaredXPCost = xpCost*xpCost;
-        levelCost.set(squaredXPCost);
+        int xpCost = BalancedEnchantmentHelper.getEnchantmentlevels(outputItem);
+
+        //int squaredXPCost = xpCost*xpCost;
+
+        levelCost.set(xpCost);
         inputItem.set(DataComponentTypes.REPAIR_COST, 0);
     }
 
