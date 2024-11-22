@@ -3,7 +3,7 @@ package nakterdalen.mctales.balance.mixin.armormixins;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import nakterdalen.mctales.balance.armor.ArmorStats;
-import nakterdalen.mctales.balance.enchantment.Enchantability;
+import nakterdalen.mctales.balance.enchanting.Enchantability;
 import net.minecraft.item.Item;
 import net.minecraft.item.equipment.ArmorMaterial;
 import net.minecraft.item.equipment.ArmorMaterials;

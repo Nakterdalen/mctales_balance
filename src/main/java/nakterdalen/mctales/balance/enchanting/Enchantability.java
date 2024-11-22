@@ -1,4 +1,4 @@
-package nakterdalen.mctales.balance.enchantment;
+package nakterdalen.mctales.balance.enchanting;
 
 public class Enchantability {
 

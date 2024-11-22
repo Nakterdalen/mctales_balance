@@ -8,6 +8,7 @@
     "armormixins.ArmorStatMixin",
     "armormixins.EquipTypeMixin",
     "enchantingmixins.EnchantabilityMixin",
+    "enchantingmixins.EnchantingScreenHandlerMixin",
     "enchantingmixins.MendingMixin",
     "gearprogressionmixins.ToolMaterialMixin"
   ],

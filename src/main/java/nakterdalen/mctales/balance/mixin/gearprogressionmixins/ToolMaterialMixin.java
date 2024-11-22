@@ -2,7 +2,7 @@ package nakterdalen.mctales.balance.mixin.gearprogressionmixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import nakterdalen.mctales.balance.enchantment.Enchantability;
+import nakterdalen.mctales.balance.enchanting.Enchantability;
 import nakterdalen.mctales.balance.toolprogression.GearStats;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
