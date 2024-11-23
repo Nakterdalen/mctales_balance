@@ -66,7 +66,7 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
                     context.drawGuiTexture(RenderLayer::getGuiTextured, ENCHANTMENT_SLOT_DISABLED_TEXTURE, m, j + 14 + 19 * l, 108, 19);
                     context.drawGuiTexture(RenderLayer::getGuiTextured, LEVEL_DISABLED_TEXTURES[l], m + 1, j + 15 + 19 * l, 16, 16);
                     context.drawTextWrapped(this.textRenderer, stringVisitable, n, j + 16 + 19 * l, p, (q & 16711422) >> 1);
-                    q = 4226832;
+                    //q = 4226832;
                 } else {
                     int r = mouseX - (i + 60);
                     int s = mouseY - (j + 14 + 19 * l);
@@ -79,7 +79,7 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
 
                     context.drawGuiTexture(RenderLayer::getGuiTextured, LEVEL_TEXTURES[l], m + 1, j + 15 + 19 * l, 16, 16);
                     context.drawTextWrapped(this.textRenderer, stringVisitable, n, j + 16 + 19 * l, p, q);
-                    q = 8453920;
+                    //q = 8453920;
                 }
 
                 //context.drawTextWithShadow(this.textRenderer, string, n + 86 - this.textRenderer.getWidth(string), j + 16 + 19 * l + 7, q);
