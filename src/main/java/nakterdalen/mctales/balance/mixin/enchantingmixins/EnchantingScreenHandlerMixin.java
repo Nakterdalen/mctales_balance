@@ -147,9 +147,9 @@ public abstract class EnchantingScreenHandlerMixin {
             ItemStack itemStack2 = this.inventory.getStack(1);
             int i = id + 1;
             if ((itemStack2.isEmpty() || itemStack2.getCount() < i) && !player.isInCreativeMode()) {
-                cir.setReturnValue(false);
+                cir.setReturnValue(Boolean.FALSE);
             } else if (this.enchantmentPower[id] <= 0 || itemStack.isEmpty() || (player.experienceLevel < i || player.experienceLevel < this.enchantmentPower[id]) && !player.getAbilities().creativeMode) {
-                cir.setReturnValue(false);
+                cir.setReturnValue(Boolean.FALSE);
             } else {
                 this.context.run((world, pos) -> {
                     ItemStack itemStack3 = itemStack;
@@ -182,12 +182,12 @@ public abstract class EnchantingScreenHandlerMixin {
                     }
 
                 });
-                cir.setReturnValue(true);
+                cir.setReturnValue(Boolean.TRUE);
             }
         } else {
             String var10000 = String.valueOf(player.getName());
             Util.logErrorOrPause(var10000 + " pressed invalid button id: " + id);
-            cir.setReturnValue(false);
+            cir.setReturnValue(Boolean.FALSE);
         }
     }
 
