@@ -3,6 +3,7 @@ package nakterdalen.mctales.balance.mixin.enchantingmixins;
 
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.EnchantingTableBlock;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
@@ -13,6 +14,8 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.EnchantmentTags;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.screen.Property;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -24,16 +27,15 @@ import net.minecraft.util.Util;
 import net.minecraft.util.collection.IndexedIterable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(EnchantmentScreenHandler.class)
 public abstract class EnchantingScreenHandlerMixin {
@@ -96,19 +98,31 @@ public abstract class EnchantingScreenHandlerMixin {
             if (!itemStack.isEmpty() && itemStack.isEnchantable()) {
                 this.context.run((world, pos) -> {
                     IndexedIterable<RegistryEntry<Enchantment>> indexedIterable = world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getIndexedEntries();
-                    int i = 0;
+                    int bookshelves = 0;
 
                     for (BlockPos blockPos : EnchantingTableBlock.POWER_PROVIDER_OFFSETS) {
                         if (EnchantingTableBlock.canAccessPowerProvider(world, pos, blockPos)) {
-                            ++i;
+                            ++bookshelves;
                         }
                     }
 
+                    int enchantability = Objects.requireNonNull(itemStack.get(DataComponentTypes.ENCHANTABLE)).value();
+
                     this.random.setSeed(this.seed.get());
 
+                    for (int j = 0; j < enchantability; ++j) {
+                        List<EnchantmentLevelEntry> list = this.generateEnchantments(world.getRegistryManager(), itemStack, j, 0);
+                        this.enchantmentPower[j] = j+1;
+                        if (list != null && !list.isEmpty()) {
+                            EnchantmentLevelEntry enchantmentLevelEntry = list.get(this.random.nextInt(list.size()));
+                            this.enchantmentId[j] = indexedIterable.getRawId(enchantmentLevelEntry.enchantment);
+                            this.enchantmentLevel[j] = enchantmentLevelEntry.level;
+                        }
+                    }
+/*
                     int j;
-                    for(j = 0; j < 3; ++j) {
-                        this.enchantmentPower[j] = EnchantmentHelper.calculateRequiredExperienceLevel(this.random, j, i, itemStack);
+                    for(j = 0; j < enchantability; ++j) {
+                        this.enchantmentPower[j] = EnchantmentHelper.calculateRequiredExperienceLevel(this.random, j, bookshelves, itemStack);
                         this.enchantmentId[j] = -1;
                         this.enchantmentLevel[j] = -1;
                         if (this.enchantmentPower[j] < j + 1) {
@@ -126,7 +140,7 @@ public abstract class EnchantingScreenHandlerMixin {
                             }
                         }
                     }
-
+ */
                     ((EnchantmentScreenHandler)(Object)this).sendContentUpdates();
                 });
             } else {
@@ -137,6 +151,7 @@ public abstract class EnchantingScreenHandlerMixin {
                 }
             }
         }
+
         ci.cancel();
     }
 
@@ -189,6 +204,49 @@ public abstract class EnchantingScreenHandlerMixin {
             Util.logErrorOrPause(var10000 + " pressed invalid button id: " + id);
             cir.setReturnValue(Boolean.FALSE);
         }
+    }
+
+    @Inject(method = "generateEnchantments", at = @At("HEAD"), cancellable = true)
+    private void generateEnchantments(DynamicRegistryManager registryManager, ItemStack stack, int slot, int dummy, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
+        this.random.setSeed(this.seed.get() + slot);
+        Optional<RegistryEntryList.Named<Enchantment>> optional = registryManager.getOrThrow(RegistryKeys.ENCHANTMENT).getOptional(EnchantmentTags.IN_ENCHANTING_TABLE);
+        if (optional.isEmpty()) {
+            cir.setReturnValue(List.of());
+        } else {
+            List<EnchantmentLevelEntry> finalList = new java.util.ArrayList<>(List.of());
+            for (int i = 0; i < slot+1; i++) {
+                if (!finalList.isEmpty() && random.nextFloat() < 0.7 ) {
+                    int enchantmentIndex = this.random.nextInt(finalList.size());
+                    boolean canIncreaseLevel = finalList.get(enchantmentIndex).level < finalList.get(enchantmentIndex).enchantment.value().getMaxLevel();
+                    if (canIncreaseLevel) {
+                        EnchantmentLevelEntry currentEntry = finalList.get(enchantmentIndex);
+                        finalList.set(enchantmentIndex, new EnchantmentLevelEntry(currentEntry.enchantment, currentEntry.level + 1));
+                    }
+                } else {
+                    boolean notAdded = true;
+                    while (notAdded) {
+                        List<EnchantmentLevelEntry> generatedList = EnchantmentHelper.generateEnchantments(this.random, stack, this.random.nextBetween(15, 30), (optional.get()).stream());
+                        generatedList.forEach(t-> System.out.println(t.enchantment.value().toString()));
+                        RegistryEntry<Enchantment> enchantment = generatedList.get(this.random.nextInt(generatedList.size())).enchantment;
+                        if (isCompatible(finalList, enchantment)) {
+                            notAdded = false;
+                            finalList.add(new EnchantmentLevelEntry(enchantment, 1));
+                        }
+                    }
+                }
+            }
+            cir.setReturnValue(finalList);
+        }
+    }
+
+    @Unique
+    private static boolean isCompatible(List<EnchantmentLevelEntry> existing, RegistryEntry<Enchantment> candidate) {
+        for(EnchantmentLevelEntry entry : existing) {
+            if (!Enchantment.canBeCombined(entry.enchantment, candidate)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
