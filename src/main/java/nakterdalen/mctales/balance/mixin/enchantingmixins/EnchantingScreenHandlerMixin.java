@@ -98,6 +98,8 @@ public abstract class EnchantingScreenHandlerMixin {
             if (!itemStack.isEmpty() && itemStack.isEnchantable()) {
                 this.context.run((world, pos) -> {
                     IndexedIterable<RegistryEntry<Enchantment>> indexedIterable = world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getIndexedEntries();
+
+                    /*
                     int bookshelves = 0;
 
                     for (BlockPos blockPos : EnchantingTableBlock.POWER_PROVIDER_OFFSETS) {
@@ -105,6 +107,8 @@ public abstract class EnchantingScreenHandlerMixin {
                             ++bookshelves;
                         }
                     }
+
+                     */
 
                     int enchantability = Objects.requireNonNull(itemStack.get(DataComponentTypes.ENCHANTABLE)).value();
 
