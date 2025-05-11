@@ -2,7 +2,6 @@ package nakterdalen.mctales.balance.mixin.enchantingmixins;
 
 
 import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.EnchantingTableBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -25,7 +24,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.IndexedIterable;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
