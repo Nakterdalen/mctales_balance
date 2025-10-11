@@ -16,6 +16,11 @@ public class ArmorWeight {
         WEIGHT_MAP.put(Items.LEATHER_LEGGINGS, 0);
         WEIGHT_MAP.put(Items.LEATHER_CHESTPLATE, 1);
         WEIGHT_MAP.put(Items.LEATHER_HELMET, 0);
+        //Copper
+        WEIGHT_MAP.put(Items.COPPER_BOOTS, 2);
+        WEIGHT_MAP.put(Items.COPPER_LEGGINGS, 3);
+        WEIGHT_MAP.put(Items.COPPER_CHESTPLATE, 4);
+        WEIGHT_MAP.put(Items.COPPER_HELMET, 3);
         //Chain
         WEIGHT_MAP.put(Items.CHAINMAIL_BOOTS, 1);
         WEIGHT_MAP.put(Items.CHAINMAIL_LEGGINGS, 1);

@@ -6,8 +6,9 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.util.Identifier;
+
+import java.util.Objects;
 
 public class WeightEvents {
 
@@ -15,7 +16,7 @@ public class WeightEvents {
 
     public static void registerWeightEvents() {
         DefaultItemComponentEvents.MODIFY.register(context -> context.modify(
-                item -> item instanceof ArmorItem, (builder, item) -> {
+                item -> item.getComponents().contains(DataComponentTypes.EQUIPPABLE) && item.getComponents().contains(DataComponentTypes.ENCHANTABLE) && Objects.requireNonNull(item.getComponents().get(DataComponentTypes.EQUIPPABLE)).slot().isArmorSlot(), (builder, item) -> {
                     AttributeModifiersComponent component = item.getComponents().get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
                     AttributeModifiersComponent.Builder componentBuilder = AttributeModifiersComponent.builder();
                     if (component == null) {

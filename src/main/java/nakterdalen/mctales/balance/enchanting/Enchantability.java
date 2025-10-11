@@ -4,6 +4,7 @@ public class Enchantability {
 
     public static final int WOOD_ENCHANTABILITY;
     public static final int STONE_ENCHANTABILITY;
+    public static final int COPPER_ENCHANTABILITY;
     public static final int IRON_ENCHANTABILITY;
     public static final int NETHERITE_ENCHANTABILITY;
     public static final int DIAMOND_ENCHANTABILITY;
@@ -21,6 +22,7 @@ public class Enchantability {
     static {
         WOOD_ENCHANTABILITY = 1;
         STONE_ENCHANTABILITY = 1;
+        COPPER_ENCHANTABILITY = 2;
         IRON_ENCHANTABILITY = 2;
         NETHERITE_ENCHANTABILITY = 2;
         DIAMOND_ENCHANTABILITY = 3;

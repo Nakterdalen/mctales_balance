@@ -1,19 +1,12 @@
 package nakterdalen.mctales.balance.mixin.enchantingmixins;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import nakterdalen.mctales.balance.MinecraftTalesBalance;
-import nakterdalen.mctales.balance.enchanting.Enchantability;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-
-import java.util.function.Function;
 
 @Mixin(Items.class)
 public class EnchantabilityMixin {
 
+    /*
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 29))
     private static Item bowEnchantability(String id, Function<Item.Settings, Item> factory, Item.Settings settings, Operation<Item> original) {
         if(!id.equals("bow")) {
@@ -69,5 +62,7 @@ public class EnchantabilityMixin {
         }
         return original.call(id, settings.enchantable(Enchantability.BOOK_ENCHANTABILITY));
     }
+
+     */
 
 }

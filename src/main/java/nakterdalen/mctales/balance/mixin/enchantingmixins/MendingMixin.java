@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EnchantmentHelper.class)
 public abstract class MendingMixin {
 
-    @Inject(method = "getRepairWithXp", at = @At(value = "RETURN"), cancellable = true)
+    @Inject(method = "getRepairWithExperience", at = @At(value = "RETURN"), cancellable = true)
     private static void reduceMendingRepair(ServerWorld world, ItemStack stack, int baseRepairWithXp, CallbackInfoReturnable<Integer> cir) {
         int level = 0;
         for (RegistryEntry<Enchantment> entry : EnchantmentHelper.getEnchantments(stack).getEnchantments()) {

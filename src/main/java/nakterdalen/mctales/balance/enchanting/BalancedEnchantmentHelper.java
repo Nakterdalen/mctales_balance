@@ -26,8 +26,8 @@ public class BalancedEnchantmentHelper {
 
         for (EnchantmentLevelEntry entry : returnList) {
             if (totalEnchants < enchantability) {
-                int enchantLevel = Math.min(entry.level, enchantability - totalEnchants);
-                EnchantmentLevelEntry newEntry = new EnchantmentLevelEntry(entry.enchantment, enchantLevel);
+                int enchantLevel = Math.min(entry.level(), enchantability - totalEnchants);
+                EnchantmentLevelEntry newEntry = new EnchantmentLevelEntry(entry.enchantment(), enchantLevel);
                 enchantmentList.add(newEntry);
                 totalEnchants += enchantLevel;
             }

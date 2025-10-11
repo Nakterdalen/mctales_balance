@@ -117,8 +117,8 @@ public abstract class EnchantingScreenHandlerMixin {
                         this.enchantmentPower[j] = j+1;
                         if (list != null && !list.isEmpty()) {
                             EnchantmentLevelEntry enchantmentLevelEntry = list.get(this.random.nextInt(list.size()));
-                            this.enchantmentId[j] = indexedIterable.getRawId(enchantmentLevelEntry.enchantment);
-                            this.enchantmentLevel[j] = enchantmentLevelEntry.level;
+                            this.enchantmentId[j] = indexedIterable.getRawId(enchantmentLevelEntry.enchantment());
+                            this.enchantmentLevel[j] = enchantmentLevelEntry.level();
                         }
                     }
 /*
@@ -179,7 +179,7 @@ public abstract class EnchantingScreenHandlerMixin {
                         }
 
                         for (EnchantmentLevelEntry enchantmentLevelEntry : list) {
-                            itemStack3.addEnchantment(enchantmentLevelEntry.enchantment, enchantmentLevelEntry.level);
+                            itemStack3.addEnchantment(enchantmentLevelEntry.enchantment(), enchantmentLevelEntry.level());
                         }
 
                         itemStack2.decrementUnlessCreative(i, player);
@@ -219,17 +219,17 @@ public abstract class EnchantingScreenHandlerMixin {
             for (int i = 0; i < slot+1; i++) {
                 if (!finalList.isEmpty() && random.nextFloat() < 0.7 ) {
                     int enchantmentIndex = this.random.nextInt(finalList.size());
-                    boolean canIncreaseLevel = finalList.get(enchantmentIndex).level < finalList.get(enchantmentIndex).enchantment.value().getMaxLevel();
+                    boolean canIncreaseLevel = finalList.get(enchantmentIndex).level() < finalList.get(enchantmentIndex).enchantment().value().getMaxLevel();
                     if (canIncreaseLevel) {
                         EnchantmentLevelEntry currentEntry = finalList.get(enchantmentIndex);
-                        finalList.set(enchantmentIndex, new EnchantmentLevelEntry(currentEntry.enchantment, currentEntry.level + 1));
+                        finalList.set(enchantmentIndex, new EnchantmentLevelEntry(currentEntry.enchantment(), currentEntry.level() + 1));
                     }
                 } else {
                     boolean notAdded = true;
                     while (notAdded) {
                         List<EnchantmentLevelEntry> generatedList = EnchantmentHelper.generateEnchantments(this.random, stack, this.random.nextBetween(15, 30), (optional.get()).stream());
-                        generatedList.forEach(t-> System.out.println(t.enchantment.value().toString()));
-                        RegistryEntry<Enchantment> enchantment = generatedList.get(this.random.nextInt(generatedList.size())).enchantment;
+                        generatedList.forEach(t-> System.out.println(t.enchantment().value().toString()));
+                        RegistryEntry<Enchantment> enchantment = generatedList.get(this.random.nextInt(generatedList.size())).enchantment();
                         if (isCompatible(finalList, enchantment)) {
                             notAdded = false;
                             finalList.add(new EnchantmentLevelEntry(enchantment, 1));
@@ -244,7 +244,7 @@ public abstract class EnchantingScreenHandlerMixin {
     @Unique
     private static boolean isCompatible(List<EnchantmentLevelEntry> existing, RegistryEntry<Enchantment> candidate) {
         for(EnchantmentLevelEntry entry : existing) {
-            if (!Enchantment.canBeCombined(entry.enchantment, candidate)) {
+            if (!Enchantment.canBeCombined(entry.enchantment(), candidate)) {
                 return false;
             }
         }

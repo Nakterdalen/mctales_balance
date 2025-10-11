@@ -8,6 +8,12 @@ public class ArmorStats {
     public static final int LEATHER_HELMET_PROTECTION;
     public static final int LEATHER_DOG_PROTECTION;
 
+    public static final int COPPER_BOOTS_PROTECTION;
+    public static final int COPPER_CHEST_PROTECTION;
+    public static final int COPPER_LEGGINGS_PROTECTION;
+    public static final int COPPER_HELMET_PROTECTION;
+    public static final int COPPER_DOG_PROTECTION;
+
     public static final int CHAIN_BOOTS_PROTECTION;
     public static final int CHAIN_LEGGINGS_PROTECTION;
     public static final int CHAIN_CHEST_PROTECTION;
@@ -38,13 +44,14 @@ public class ArmorStats {
     public static final int GOLD_HELMET_PROTECTION;
     public static final int GOLD_DOG_PROTECTION;
 
-    public  static final int LEATHER_DURABILITY;
-    public  static final int CHAIN_DURABILITY;
-    public  static final int IRON_DURABILITY;
-    public  static final int NETHERITE_DURABILITY;
-    public  static final int DIAMOND_DURABILITY;
-    public  static final int GOLD_DURABILITY;
-    public  static final int TURTLE_DURABILITY;
+    public static final int LEATHER_DURABILITY;
+    public static final int COPPER_DURABILITY;
+    public static final int CHAIN_DURABILITY;
+    public static final int IRON_DURABILITY;
+    public static final int NETHERITE_DURABILITY;
+    public static final int DIAMOND_DURABILITY;
+    public static final int GOLD_DURABILITY;
+    public static final int TURTLE_DURABILITY;
 
     static {
 
@@ -53,6 +60,12 @@ public class ArmorStats {
         LEATHER_CHEST_PROTECTION = 3;
         LEATHER_HELMET_PROTECTION = 1;
         LEATHER_DOG_PROTECTION = 3;
+
+        COPPER_BOOTS_PROTECTION = 1;
+        COPPER_LEGGINGS_PROTECTION = 3;
+        COPPER_CHEST_PROTECTION = 4;
+        COPPER_HELMET_PROTECTION = 2;
+        COPPER_DOG_PROTECTION = 3;
 
         CHAIN_BOOTS_PROTECTION = 1;
         CHAIN_LEGGINGS_PROTECTION = 4;
@@ -85,11 +98,12 @@ public class ArmorStats {
         GOLD_DOG_PROTECTION = 7;
 
         LEATHER_DURABILITY = 26;
+        COPPER_DURABILITY = 28;
         CHAIN_DURABILITY = 32;
         IRON_DURABILITY = 46;
         NETHERITE_DURABILITY = 54;
         DIAMOND_DURABILITY = 64;
-        GOLD_DURABILITY = 13;
+        GOLD_DURABILITY = 16;
         TURTLE_DURABILITY = 32;
 
     }
