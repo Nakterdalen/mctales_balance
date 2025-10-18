@@ -62,7 +62,7 @@ public class AnvilRepairs {
 
         // Mace
         if (stack.isOf(Items.MACE)) {
-            return currentDamage - (stack.getMaxDamage()/3);
+            return 0;
         }
 
         // Elytra

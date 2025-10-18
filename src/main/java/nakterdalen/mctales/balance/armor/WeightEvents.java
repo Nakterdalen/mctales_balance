@@ -7,6 +7,7 @@ import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.Identifier;
+import org.apache.logging.log4j.core.config.builder.api.ComponentBuilder;
 
 public class WeightEvents {
 
@@ -29,8 +30,4 @@ public class WeightEvents {
                                     component.modifiers().getFirst().slot())
                             .build());}));
     }
-    /*
-
-
-     */
 }
