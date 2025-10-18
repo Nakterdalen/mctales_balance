@@ -16,7 +16,7 @@ public class WeightEvents {
 
     public static void registerWeightEvents() {
         DefaultItemComponentEvents.MODIFY.register(context -> context.modify(
-                item -> item.getComponents().contains(DataComponentTypes.EQUIPPABLE) && item.getComponents().contains(DataComponentTypes.ENCHANTABLE) && Objects.requireNonNull(item.getComponents().get(DataComponentTypes.EQUIPPABLE)).slot().isArmorSlot(), (builder, item) -> {
+                ArmorWeight.WEIGHT_MAP.keySet()::contains, (builder, item) -> {
                     AttributeModifiersComponent component = item.getComponents().get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
                     AttributeModifiersComponent.Builder componentBuilder = AttributeModifiersComponent.builder();
                     if (component == null) {

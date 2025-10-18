@@ -7,9 +7,9 @@
     "S": "minecraft:netherite_upgrade_smithing_template"
   },
   "pattern": [
-    "#S#",
-    "#C#",
-    "###"
+    "CSC",
+    "C#C",
+    "CCC"
   ],
   "result": {
     "count": 2,

@@ -18,18 +18,19 @@ public class GearStats {
     public static final float DIAMOND_SPEED;
     public static final float GOLD_SPEED;
 
+    public static final float GOLD_ATTACK;
     public static final float NETHERITE_ATTACK;
     public static final float DIAMOND_ATTACK;
 
     static {
 
         WOOD_DURABILITY = 54;
-        COPPER_DURABILITY = 201;
         STONE_DURABILITY = 162;
-        IRON_DURABILITY = 486;
-        NETHERITE_DURABILITY = 1584;
-        DIAMOND_DURABILITY = 2820;
-        GOLD_DURABILITY = 114;
+        COPPER_DURABILITY = 204;
+        IRON_DURABILITY = 492;
+        NETHERITE_DURABILITY = 1674;
+        DIAMOND_DURABILITY = 3012;
+        GOLD_DURABILITY = 216;
 
         WOOD_SPEED = 2.0f;
         STONE_SPEED = 3.5f;
@@ -39,6 +40,7 @@ public class GearStats {
         DIAMOND_SPEED = 21.0f;
         GOLD_SPEED = 32.0f;
 
+        GOLD_ATTACK = 1.0f;
         NETHERITE_ATTACK = 3.0f;
         DIAMOND_ATTACK = 4.0f;
 

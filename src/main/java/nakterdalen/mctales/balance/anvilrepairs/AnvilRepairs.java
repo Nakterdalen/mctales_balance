@@ -10,8 +10,9 @@ public class AnvilRepairs {
         int currentDamage = stack.getDamage();
 
         // Netherite
-        if (stack.canRepairWith(Items.NETHERITE_INGOT.getRecipeRemainder())) {
-            return stack.getMaxDamage();
+        if (stack.canRepairWith(Items.NETHERITE_INGOT.getDefaultStack())) {
+            //return stack.getMaxDamage();
+            return 0;
         }
 
         // Axes & Pickaxes
@@ -26,7 +27,7 @@ public class AnvilRepairs {
 
         // Shovels
         if (stack.isIn(ItemTags.SHOVELS)) {
-            return stack.getMaxDamage();
+            return 0;
         }
 
         // Helmets

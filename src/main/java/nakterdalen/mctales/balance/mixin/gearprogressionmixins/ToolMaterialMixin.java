@@ -46,7 +46,7 @@ public abstract class ToolMaterialMixin {
     // Change Gold
     @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "Lnet/minecraft/item/ToolMaterial;", ordinal = 5))
     private static ToolMaterial newGoldStats(TagKey<Block> noDropTag, int durability, float speed, float attackBonus, int enchantValue, TagKey<Item> repairItems, Operation<ToolMaterial> original) {
-        return original.call(noDropTag, GearStats.GOLD_DURABILITY, GearStats.GOLD_SPEED, attackBonus, Enchantability.GOLD_ENCHANTABILITY, repairItems);
+        return original.call(noDropTag, GearStats.GOLD_DURABILITY, GearStats.GOLD_SPEED, GearStats.GOLD_ATTACK, Enchantability.GOLD_ENCHANTABILITY, repairItems);
     }
 
     // Change Netherite
