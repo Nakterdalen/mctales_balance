@@ -3,7 +3,6 @@
   "package": "nakterdalen.mctales.balance.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "EnchantmentScreenMixin",
     "ExampleClientMixin"
   ],
   "injectors": {

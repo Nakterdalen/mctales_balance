@@ -1,7 +1,16 @@
 package nakterdalen.mctales.balance.mixin.enchantingmixins;
 
+import nakterdalen.mctales.balance.enchanting.Enchantability;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.function.Function;
 
 @Mixin(Items.class)
 public class EnchantabilityMixin {
@@ -14,55 +23,52 @@ public class EnchantabilityMixin {
         }
         return original.call(id, factory, settings.enchantable(Enchantability.BOW_ENCHANTABILITY));
     }
+    */
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 101))
-    private static Item crossbowEnchantability(String id, Function<Item.Settings, Item> factory, Item.Settings settings, Operation<Item> original) {
-        if(!id.equals("crossbow")) {
-            MinecraftTalesBalance.LOGGER.error("Mixin ordinal did not match crossbow.");
-        }
-        return original.call(id, factory, settings.enchantable(Enchantability.CROSSBOW_ENCHANTABILITY));
+    @Inject(method = "register(Ljava/lang/String;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", at = @At("HEAD"))
+    private static void register1(String id, Item.Settings settings, CallbackInfoReturnable<Item> cir){
+        addEnchantability(id, settings);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 72))
-    private static Item fishingRodEnchantability(String id, Function<Item.Settings, Item> factory, Item.Settings settings, Operation<Item> original) {
-        if(!id.equals("fishing_rod")) {
-            MinecraftTalesBalance.LOGGER.error("Mixin ordinal did not match fishing rod.");
-        }
-        return original.call(id, factory, settings.enchantable(Enchantability.FISHING_ROD_ENCHANTABILITY));
+    @Inject(method = "register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", at = @At("HEAD"))
+    private static void register2(String id, Function<Item.Settings, Item> factory, Item.Settings settings, CallbackInfoReturnable<Item> cir){
+        addEnchantability(id, settings);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 82))
-    private static Item maceEnchantability(String id, Function<Item.Settings, Item> factory, Item.Settings settings, Operation<Item> original) {
-        if(!id.equals("mace")) {
-            MinecraftTalesBalance.LOGGER.error("Mixin ordinal did not match mace.");
-        }
-        return original.call(id, factory, settings.enchantable(Enchantability.MACE_ENCHANTABILITY));
+    @Inject(method = "register(Lnet/minecraft/registry/RegistryKey;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", at = @At("HEAD"))
+    private static void register3(RegistryKey<Item> key, Function<Item.Settings, Item> factory, Item.Settings settings, CallbackInfoReturnable<Item> cir){
+        addEnchantability(key.getValue().getNamespace(), settings);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 100))
-    private static Item tridentEnchantability(String id, Function<Item.Settings, Item> factory, Item.Settings settings, Operation<Item> original) {
-        if(!id.equals("trident")) {
-            MinecraftTalesBalance.LOGGER.error("Mixin ordinal did not match trident.");
+    @Unique
+    private static void addEnchantability(String id, Item.Settings settings) {
+        if (id.equals("bow")) {
+            settings.enchantable(Enchantability.BOW_ENCHANTABILITY);
         }
-        return original.call(id, factory, settings.enchantable(Enchantability.TRIDENT_ENCHANTABILITY));
-    }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 75))
-    private static Item shearsEnchantability(String id, Function<Item.Settings, Item> factory, Item.Settings settings, Operation<Item> original) {
-        if(!id.equals("shears")) {
-            MinecraftTalesBalance.LOGGER.error("Mixin ordinal did not match shears.");
+        if (id.equals("crossbow")) {
+            settings.enchantable(Enchantability.CROSSBOW_ENCHANTABILITY);
         }
-        return original.call(id, factory, settings.enchantable(Enchantability.IRON_ENCHANTABILITY));
-    }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/Items;register(Ljava/lang/String;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", ordinal = 11))
-    private static Item bookEnchantability(String id, Item.Settings settings, Operation<Item> original) {
-        if(!id.equals("book")) {
-            MinecraftTalesBalance.LOGGER.error("Mixin ordinal did not match book.");
+        if (id.equals("fishing_rod")) {
+            settings.enchantable(Enchantability.FISHING_ROD_ENCHANTABILITY);
         }
-        return original.call(id, settings.enchantable(Enchantability.BOOK_ENCHANTABILITY));
-    }
 
-     */
+        if (id.equals("mace")) {
+            settings.enchantable(Enchantability.MACE_ENCHANTABILITY);
+        }
+
+        if (id.equals("trident")) {
+            settings.enchantable(Enchantability.TRIDENT_ENCHANTABILITY);
+        }
+
+        if (id.equals("shears")) {
+            settings.enchantable(Enchantability.IRON_ENCHANTABILITY);
+        }
+
+        if (id.equals("book")) {
+            settings.enchantable(Enchantability.BOOK_ENCHANTABILITY);
+        }
+    }
 
 }
