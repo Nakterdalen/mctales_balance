@@ -8,8 +8,6 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-
 public class WeightEvents {
 
     private static final String MOD_ID = MinecraftTalesBalance.MOD_ID;
