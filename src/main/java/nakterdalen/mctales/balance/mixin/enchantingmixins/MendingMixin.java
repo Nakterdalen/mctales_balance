@@ -19,7 +19,7 @@ public abstract class MendingMixin {
         for (RegistryEntry<Enchantment> entry : EnchantmentHelper.getEnchantments(stack).getEnchantments()) {
             level += EnchantmentHelper.getLevel(entry, stack);
         }
-        cir.setReturnValue(cir.getReturnValue()/(Math.max(1, level)));
+        cir.setReturnValue(cir.getReturnValue() * 3 / (2 + Math.max(level, 4)));
     }
 
 }
