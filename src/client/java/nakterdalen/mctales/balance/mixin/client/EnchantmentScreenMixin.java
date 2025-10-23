@@ -1,12 +1,15 @@
 package nakterdalen.mctales.balance.mixin.client;
 
+import nakterdalen.mctales.balance.enchanting.IEnchantingHandler;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.EnchantingPhrases;
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.StringVisitable;
@@ -17,13 +20,13 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentScreenHandler> {
 
-    //@Shadow unique only temp
     @Final
     @Shadow
     protected abstract void drawBook(DrawContext context, int x, int y);
@@ -47,10 +50,48 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
     @Shadow
     private static Identifier TEXTURE;
 
-    //Identifier.ofVanilla("textures/gui/container/enchanting_table.png");
+    @Unique
+    private float scrollPosition;
+    @Unique
+    private boolean scrollBarClicked;
+    @Unique
+    private boolean canScroll;
 
     public EnchantmentScreenMixin(ScreenHandler handler, PlayerInventory inventory, Text title) {
         super((EnchantmentScreenHandler) handler, inventory, title);
+    }
+
+    @Unique
+    private void checkScroll() {
+
+        ItemStack enchantedItem = this.handler.slots.getFirst().getStack();
+
+        if (enchantedItem.isEnchantable() && Objects.requireNonNull(enchantedItem.get(DataComponentTypes.ENCHANTABLE)).value() > 3) {
+            System.out.println("We made it");
+            this.canScroll = true;
+        }
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void injectConstructor(EnchantmentScreenHandler handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
+        scrollPosition = 0f;
+        scrollBarClicked = false;
+        canScroll = false;
+
+        ((IEnchantingHandler) handler).balance$setEnchantingListener(this::checkScroll);
+    }
+
+    @Inject(method = "mouseClicked", at = @At("HEAD"))
+    private void addToMouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        this.scrollBarClicked = false;
+        /*
+        if ()
+        if (click.x() >= (double)i && click.x() < (double)(i + 12) && click.y() >= (double)j && click.y() < (double)(j + 56)) {
+            this.scrollbarClicked = true;
+            System.out.println("we are clicking.");
+        }
+
+         */
     }
 
     @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
@@ -102,6 +143,11 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             }
 
             context.drawTextWithShadow(this.textRenderer, string, n + 86 - this.textRenderer.getWidth(string), j + 16 + 19 * alt + 7, q);
+
+            // just for show, remove later
+            if (this.canScroll) {
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_TEXTURE, m+40, j + 14 + 19 * alt, 108, 19);
+            }
         }
         ci.cancel();
     }
