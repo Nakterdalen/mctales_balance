@@ -50,7 +50,9 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
     @Shadow
     private static Identifier TEXTURE;
 
+    @Unique
     private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("container/loom/scroller");
+    @Unique
     private static final Identifier SCROLLER_DISABLED_TEXTURE = Identifier.ofVanilla("container/loom/scroller_disabled");
 
     @Unique
