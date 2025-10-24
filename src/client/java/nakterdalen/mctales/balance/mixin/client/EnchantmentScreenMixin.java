@@ -50,6 +50,9 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
     @Shadow
     private static Identifier TEXTURE;
 
+    private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("container/loom/scroller");
+    private static final Identifier SCROLLER_DISABLED_TEXTURE = Identifier.ofVanilla("container/loom/scroller_disabled");
+
     @Unique
     private float scrollPosition;
     @Unique
@@ -63,11 +66,9 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
 
     @Unique
     private void checkScroll() {
-
+        this.canScroll = false;
         ItemStack enchantedItem = this.handler.slots.getFirst().getStack();
-
         if (enchantedItem.isEnchantable() && Objects.requireNonNull(enchantedItem.get(DataComponentTypes.ENCHANTABLE)).value() > 3) {
-            System.out.println("We made it");
             this.canScroll = true;
         }
     }
@@ -77,7 +78,7 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         scrollPosition = 0f;
         scrollBarClicked = false;
         canScroll = false;
-
+        System.out.println("How many times do we reset");
         ((IEnchantingHandler) handler).balance$setEnchantingListener(this::checkScroll);
     }
 
@@ -115,13 +116,13 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             int xpLevel = alt + 1;
 
             String string = "" + xpLevel;
-            int p = 86 - this.textRenderer.getWidth(string);
+            int p = 86 - this.textRenderer.getWidth(string) - 10;
             StringVisitable stringVisitable = EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, p);
 
             int q = -9937334;
             if ((lapisCount < alt + 1 || Objects.requireNonNull(Objects.requireNonNull(this.client).player).experienceLevel < xpLevel) && !Objects.requireNonNull(Objects.requireNonNull(this.client).player).getAbilities().creativeMode) {
                 //alternative not available
-                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_TEXTURE, m, j + 14 + 19 * alt, 108, 19);
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_TEXTURE, m, j + 14 + 19 * alt, 93, 19);
                 context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, LEVEL_DISABLED_TEXTURES[Math.min(alt, 2)], m + 1, j + 15 + 19 * alt, 16, 16);
                 context.drawWrappedText(this.textRenderer, stringVisitable, n, j + 16 + 19 * alt, p, ColorHelper.fullAlpha((q & 16711422) >> 1), false);
                 q = -12550384;
@@ -131,10 +132,10 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
                 int s = mouseY - (j + 14 + 19 * alt);
 
                 if (r >= 0 && s >= 0 && r < 108 && s < 19) {
-                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_TEXTURE, m, j + 14 + 19 * alt, 108, 19);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_TEXTURE, m, j + 14 + 19 * alt, 93, 19);
                     q = 16777088;
                 } else {
-                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_TEXTURE, m, j + 14 + 19 * alt, 108, 19);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_TEXTURE, m, j + 14 + 19 * alt, 93, 19);
                 }
 
                 context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, LEVEL_TEXTURES[Math.min(alt, 2)], m + 1, j + 15 + 19 * alt, 16, 16);
@@ -143,12 +144,10 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             }
 
             context.drawTextWithShadow(this.textRenderer, string, n + 86 - this.textRenderer.getWidth(string), j + 16 + 19 * alt + 7, q);
-
-            // just for show, remove later
-            if (this.canScroll) {
-                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_TEXTURE, m+40, j + 14 + 19 * alt, 108, 19);
-            }
         }
+        int k = 0;
+        Identifier identifier = this.canScroll ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, identifier, i + 156, j + 14 + k, 12, 15);
         ci.cancel();
     }
 }
