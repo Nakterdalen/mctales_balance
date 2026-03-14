@@ -92,14 +92,25 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
     @Inject(method = "mouseClicked", at = @At("HEAD"))
     private void addToMouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         this.scrollBarClicked = false;
-        /*
-        if ()
-        if (click.x() >= (double)i && click.x() < (double)(i + 12) && click.y() >= (double)j && click.y() < (double)(j + 56)) {
-            this.scrollbarClicked = true;
-            System.out.println("we are clicking.");
+        double xval = click.x() - (double) (this.width - this.backgroundWidth) / 2;
+        double yval = click.y() - (double) (this.height - this.backgroundHeight) / 2;
+        if (xval > 156 && xval < 168 && yval > 14 + 42*scrollPosition && yval < 29 + 42*scrollPosition) {
+            this.scrollBarClicked = true;
         }
+    }
 
-         */
+    public boolean mouseDragged(Click click, double offsetX, double offsetY) {
+        int i = this.enchantNumber - 3;
+        if (this.scrollBarClicked && this.canScroll && i > 0) {
+            int j = this.y + 13;
+            int k = j + 56;
+            this.scrollPosition = ((float)click.y() - (float)j - 7.5F) / ((float)(k - j) - 15.0F);
+            this.scrollPosition = MathHelper.clamp(this.scrollPosition, 0.0F, 1.0F);
+            this.visibleTopRow = Math.max((int)((double)(this.scrollPosition * (float)i) + (double)0.5F), 0);
+            return true;
+        } else {
+            return super.mouseDragged(click, offsetX, offsetY);
+        }
     }
 
     @Override
@@ -129,6 +140,11 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
 
         ItemStack enchantingStack = this.handler.slots.getFirst().getStack();
         int enchantability = enchantingStack.isEmpty() || !enchantingStack.isEnchantable() ? 0 : Objects.requireNonNull(enchantingStack.get(DataComponentTypes.ENCHANTABLE)).value();
+
+        if(enchantability  == 0) {
+            this.scrollPosition = 0f;
+            this.visibleTopRow = 0;
+        }
 
         int topRow = 0;
         if (this.canScroll) {
@@ -180,7 +196,7 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         }
         int k = 0;
         Identifier scrollHandle = this.canScroll ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, scrollHandle, i + 156, j + 14 + k + 42 * topRow/(Math.max((enchantability-3), 1)), 12, 15);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, scrollHandle, i + 156, j + 14 + k + (int)(42 * this.scrollPosition), 12, 15);
         ci.cancel();
     }
 }
