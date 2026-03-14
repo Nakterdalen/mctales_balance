@@ -86,7 +86,6 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         scrollPosition = 0f;
         scrollBarClicked = false;
         canScroll = false;
-        System.out.println("How many times do we reset");
         ((IEnchantingHandler) handler).balance$setEnchantingListener(this::checkScroll);
     }
 
@@ -128,10 +127,10 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         this.drawBook(context, i, j);
         int lapisCount = this.handler.getLapisCount();
 
-        int enchantability = this.handler.slots.getFirst().getStack().isEmpty() ? 0 : Objects.requireNonNull(this.handler.slots.getFirst().getStack().get(DataComponentTypes.ENCHANTABLE)).value();
+        ItemStack enchantingStack = this.handler.slots.getFirst().getStack();
+        int enchantability = enchantingStack.isEmpty() || !enchantingStack.isEnchantable() ? 0 : Objects.requireNonNull(enchantingStack.get(DataComponentTypes.ENCHANTABLE)).value();
 
         int topRow = 0;
-
         if (this.canScroll) {
             topRow = this.visibleTopRow;
         }
