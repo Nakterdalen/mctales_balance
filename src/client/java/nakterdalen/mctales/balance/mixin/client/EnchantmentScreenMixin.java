@@ -8,24 +8,28 @@ import net.minecraft.client.gui.screen.ingame.EnchantingPhrases;
 import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.EnchantmentScreenHandler;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.*;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentScreenHandler> {
@@ -51,6 +55,9 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
     @Shadow
     private static Identifier TEXTURE;
 
+    @Shadow
+    protected abstract void init();
+
     @Unique
     private static final Identifier SCROLLER_TEXTURE = Identifier.ofVanilla("container/loom/scroller");
     @Unique
@@ -67,6 +74,12 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
     @Unique
     private int visibleTopRow;
 
+    @Unique
+    private int bookCount;
+
+    @Unique
+    private int toolTipNumber;
+
     public EnchantmentScreenMixin(ScreenHandler handler, PlayerInventory inventory, Text title) {
         super((EnchantmentScreenHandler) handler, inventory, title);
     }
@@ -81,12 +94,19 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         }
     }
 
+    @Unique
+    private void checkBooks() {
+        this.bookCount = ((IEnchantingHandler)this.handler).balance$getCount();
+    }
+
     @Inject(method = "<init>", at = @At("TAIL"))
     private void injectConstructor(EnchantmentScreenHandler handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
         scrollPosition = 0f;
         scrollBarClicked = false;
         canScroll = false;
+        bookCount = 0;
         ((IEnchantingHandler) handler).balance$setEnchantingListener(this::checkScroll);
+        ((IEnchantingHandler) handler).balance$getBookCount(this::checkBooks);
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"))
@@ -180,7 +200,7 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
                 int r = mouseX - (i + 60);
                 int s = mouseY - (j + 14 + 19 * alt);
 
-                if (r >= 0 && s >= 0 && r < 108 && s < 19) {
+                if (r >= 0 && s >= 0 && r < 93 && s < 19) {
                     context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_TEXTURE, m, j + 14 + 19 * alt, 93, 19);
                     q = -128;
                 } else {
@@ -198,5 +218,51 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         Identifier scrollHandle = this.canScroll ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, scrollHandle, i + 156, j + 14 + k + (int)(42 * this.scrollPosition), 12, 15);
         ci.cancel();
+    }
+
+    @ModifyConstant(method = "mouseClicked", constant = @Constant(doubleValue = 108f))
+    private double newBoundsForButton(double constant) {
+        return 93.0F;
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getEntry(I)Ljava/util/Optional;"))
+    private void hintModifier(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci){
+        int j = (this.height - this.backgroundHeight) / 2;
+        this.toolTipNumber = this.visibleTopRow;
+        int relY = mouseY + j;
+        if (relY > 107) {
+            this.toolTipNumber++;
+        }
+        if (relY > 127) {
+            this.toolTipNumber++;
+        }
+    }
+
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II)V"), index = 1)
+    private List<Text> alterTooltip(List<Text> text) {
+        assert this.client != null;
+        assert this.client.world != null;
+        // must be changed when handler is updated with more enchantments.
+        int j = 1;
+        Optional<RegistryEntry.Reference<Enchantment>> optional = this.client.world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getEntry(this.handler.enchantmentId[j]);
+        if (optional.isPresent()) {
+            text.removeFirst();
+            checkBooks();
+            Text enchant = Enchantment.getName(optional.get(), 0);
+            if (this.toolTipNumber+1 > this.bookCount) {
+                text.addFirst(Text.translatable("container.enchant.clue", "").formatted(Formatting.WHITE));
+            } else if (toolTipNumber == 0){
+                text.addFirst(enchant);
+            } else {
+                text.addFirst(Text.translatable("container.enchant.clue", enchant).formatted(Formatting.WHITE));
+            }
+        }
+        return text;
+    }
+
+    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;isPointWithinBounds(IIIIDD)Z"))
+    private void changeBounds(Args args) {
+        args.set(0, 61);
+        args.set(2, 91);
     }
 }

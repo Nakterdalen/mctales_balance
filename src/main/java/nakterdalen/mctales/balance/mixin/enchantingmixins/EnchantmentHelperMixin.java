@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Mixin(EnchantmentHelper.class)
-public abstract class EnchantabilityCapMixin {
+public abstract class EnchantmentHelperMixin {
 
     @Shadow
     private static ComponentType<ItemEnchantmentsComponent> getEnchantmentsComponentType(ItemStack stack) {

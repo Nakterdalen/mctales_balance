@@ -1,4 +1,5 @@
 {
   "item.minecraft.smithing_template.netherite_upgrade.applies_to": "Iron Equipment",
-  "item.minecraft.smithing_template.netherite_upgrade.base_slot_description": "Add iron armor, weapon, or tool"
+  "item.minecraft.smithing_template.netherite_upgrade.base_slot_description": "Add iron armor, weapon, or tool",
+  "enchantment.level.0": ""
 }

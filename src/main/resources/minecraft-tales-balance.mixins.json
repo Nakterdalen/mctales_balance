@@ -6,7 +6,7 @@
     "anvilmixins.anvilBalanceMixin",
     "armormixins.ArmorStatMixin",
     "armormixins.EquipTypeMixin",
-    "enchantingmixins.EnchantabilityCapMixin",
+    "enchantingmixins.EnchantmentHelperMixin",
     "enchantingmixins.EnchantabilityMixin",
     "enchantingmixins.EnchantingScreenHandlerMixin",
     "enchantingmixins.MendingMixin",
