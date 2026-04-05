@@ -9,7 +9,6 @@ import net.minecraft.client.gui.screen.ingame.EnchantmentScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKeys;
@@ -251,35 +250,38 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
 
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II)V"), index = 1)
     private List<Text> alterTooltip(List<Text> text) {
-        assert this.client != null && this.client.world != null;
+        if (this.client == null || this.client.world == null) return text;
+        text.clear();
         checkEnchants();
-
         Optional<RegistryEntry.Reference<Enchantment>> optional = this.client.world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getEntry(this.enchants[this.toolTipNumber]);
 
         if (optional.isPresent()) {
-            text.removeFirst();
             checkBooks();
-            System.out.println("We check the books: " + this.bookCount);
             Text enchant = Enchantment.getName(optional.get(), 0);
-            //System.out.println("We have the following enchants: " + this.enchants[this.toolTipNumber] + " " + this.toolTipNumber);
             if (this.toolTipNumber+1 > this.bookCount) {
-                System.out.println("Tooltip : Bookcount " + this.toolTipNumber + " : " + this.bookCount);
                 text.addFirst(Text.translatable("container.enchant.clue", "").formatted(Formatting.WHITE));
             } else if (toolTipNumber == 0){
                 text.addFirst(enchant);
             } else {
                 text.addFirst(Text.translatable("container.enchant.clue", enchant).formatted(Formatting.WHITE));
             }
-        } else {
-            text.clear();
+
+            if (this.client.player != null && !this.client.player.isCreative()) {
+                MutableText lapisText;
+                MutableText levelText;
+                int price = this.toolTipNumber + 1;
+                if (price == 1) {
+                    lapisText = Text.translatable("container.enchant.lapis.one");
+                    levelText = Text.translatable("container.enchant.level.one");
+                } else {
+                    lapisText = Text.translatable("container.enchant.lapis.many", price);
+                    levelText = Text.translatable("container.enchant.level.many", price);
+                }
+                text.add(lapisText.formatted(this.handler.getLapisCount() >= price ? Formatting.GRAY : Formatting.RED));
+                text.add(levelText.formatted(this.client.player.experienceLevel >= price ? Formatting.GRAY : Formatting.RED));
+            }
         }
         return text;
-    }
-
-    @ModifyVariable(method = "render", at = @At("STORE"), ordinal = 4)
-    private int preventLevelRequirementText(int value){
-        System.out.println("What do we have initially? " + value);
-        return 1;
     }
 
     @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;isPointWithinBounds(IIIIDD)Z"))
