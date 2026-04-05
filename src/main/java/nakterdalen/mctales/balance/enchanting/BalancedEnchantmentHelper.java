@@ -5,6 +5,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.util.math.random.Random;
@@ -50,7 +51,8 @@ public class BalancedEnchantmentHelper {
             List<Float> probList = new LinkedList<>();
             enchantList.forEach((entry) ->probList.add(random.nextFloat()));
             for (int i = 0; i < enchantList.size(); i++) {
-                if (enchantList.get(i).enchantment().value().getMaxLevel() != enchantList.get(i).level() && probList.get(i) < 0.7f) {
+                float probIncrease = stack.isOf(Items.BOOK) ? 1.0f : 0.7f;
+                if (enchantList.get(i).enchantment().value().getMaxLevel() != enchantList.get(i).level() && probList.get(i) < probIncrease) {
                     enchantList.set(i, new EnchantmentLevelEntry(enchantList.get(i).enchantment(), enchantList.get(i).level()+1));
                     totalLevel++;
                     break;

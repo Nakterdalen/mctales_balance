@@ -129,6 +129,11 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         }
     }
 
+    @ModifyArg(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;clickButton(II)V"), index = 1)
+    private int changeButtonNumberSync(int syncId) {
+        return syncId + this.visibleTopRow;
+    }
+
     public boolean mouseDragged(Click click, double offsetX, double offsetY) {
         int i = this.enchantNumber - 3;
         if (this.scrollBarClicked && this.canScroll && i > 0) {
