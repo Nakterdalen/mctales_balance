@@ -266,7 +266,7 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             if (this.toolTipNumber+1 > this.bookCount) {
                 text.addFirst(Text.translatable("container.enchant.clue", "").formatted(Formatting.WHITE));
             } else if (toolTipNumber == 0){
-                text.addFirst(enchant);
+                text.addFirst(Enchantment.getName(optional.get(), 1));
             } else {
                 text.addFirst(Text.translatable("container.enchant.clue", enchant).formatted(Formatting.WHITE));
             }
