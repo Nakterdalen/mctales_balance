@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.EnchantmentLevelEntry;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
@@ -12,8 +11,6 @@ import net.minecraft.util.math.random.Random;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 
 public class BalancedEnchantmentHelper {
