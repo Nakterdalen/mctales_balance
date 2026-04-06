@@ -171,6 +171,7 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
         this.sendContentUpdates();
     }
 
+    //ought to try to figure out why I do this
     @ModifyVariable(method = "generateEnchantments", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;generateEnchantments(Lnet/minecraft/util/math/random/Random;Lnet/minecraft/item/ItemStack;ILjava/util/stream/Stream;)Ljava/util/List;"), index = 3, argsOnly = true)
     private int modifyLevel(int value) {
         return 10;
