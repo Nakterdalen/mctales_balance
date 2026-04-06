@@ -50,24 +50,31 @@ public class BalancedEnchantmentHelper {
         while (totalLevel < level) {
             List<Float> probList = new LinkedList<>();
             enchantList.forEach((entry) ->probList.add(random.nextFloat()));
+            boolean hasAdded = false;
             for (int i = 0; i < enchantList.size(); i++) {
                 float probIncrease = stack.isOf(Items.BOOK) ? 1.0f : 0.7f;
-                if (enchantList.get(i).enchantment().value().getMaxLevel() != enchantList.get(i).level() && probList.get(i) < probIncrease) {
-                    enchantList.set(i, new EnchantmentLevelEntry(enchantList.get(i).enchantment(), enchantList.get(i).level()+1));
-                    totalLevel++;
-                    break;
-                } else {
-                    List<RegistryEntry<Enchantment>> filterList = new LinkedList<>();
-                    enchantList.forEach(e -> filterList.add(e.enchantment()));
-                    List<EnchantmentLevelEntry> interList = EnchantmentHelper.generateEnchantments(random, stack, 30, entryList
-                            .stream().filter(entry -> EnchantmentHelper.isCompatible(filterList, entry)));
-                    if (!interList.isEmpty()) {
-                        EnchantmentLevelEntry midEntry = interList.getFirst();
-                        midEntry = new EnchantmentLevelEntry(midEntry.enchantment(), 1);
-                        enchantList.add(midEntry);
+                if (level == 3 && enchantList.get(i).enchantment().value().getMaxLevel() == 1) {
+                    System.out.println("We are testing books: " + enchantList.get(i).enchantment().value().toString());
+                }
+                if (enchantList.get(i).enchantment().value().getMaxLevel() != enchantList.get(i).level()) {
+                    if (probList.get(i) <= probIncrease) {
+                        enchantList.set(i, new EnchantmentLevelEntry(enchantList.get(i).enchantment(), enchantList.get(i).level()+1));
                         totalLevel++;
+                        hasAdded = true;
                         break;
                     }
+                }
+            }
+            if (!hasAdded) {
+                List<RegistryEntry<Enchantment>> filterList = new LinkedList<>();
+                enchantList.forEach(e -> filterList.add(e.enchantment()));
+                List<EnchantmentLevelEntry> interList = EnchantmentHelper.generateEnchantments(random, stack, 30, entryList
+                        .stream().filter(entry -> EnchantmentHelper.isCompatible(filterList, entry)));
+                if (!interList.isEmpty()) {
+                    EnchantmentLevelEntry midEntry = interList.getFirst();
+                    midEntry = new EnchantmentLevelEntry(midEntry.enchantment(), 1);
+                    enchantList.add(midEntry);
+                    totalLevel++;
                 }
             }
         }
