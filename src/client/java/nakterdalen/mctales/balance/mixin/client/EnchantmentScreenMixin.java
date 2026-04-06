@@ -1,5 +1,6 @@
 package nakterdalen.mctales.balance.mixin.client;
 
+import com.google.common.collect.Lists;
 import nakterdalen.mctales.balance.enchanting.IEnchantingHandler;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
@@ -24,7 +25,6 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -192,6 +192,8 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             phraseList.add(EnchantingPhrases.getInstance().generatePhrase(this.textRenderer, phraseWidth));
         }
 
+        int yOffset = 14;
+
         for(int alt = 0; alt < Math.min(enchantability, 3); alt++) {
             int m = width + 60;
             int n = m + 20;
@@ -206,32 +208,32 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             int q = -9937334;
             if ((lapisCount < topRow + alt + 1 || Objects.requireNonNull(Objects.requireNonNull(this.client).player).experienceLevel < xpLevel) && !Objects.requireNonNull(Objects.requireNonNull(this.client).player).getAbilities().creativeMode) {
                 //alternative not available
-                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_TEXTURE, m, height + 14 + 19 * alt, 93, 19);
-                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, LEVEL_DISABLED_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + 15 + 19 * alt, 16, 16);
-                context.drawWrappedText(this.textRenderer, stringVisitable, n, height + 16 + 19 * alt, p, ColorHelper.fullAlpha((q & 16711422) >> 1), false);
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_TEXTURE, m, height + yOffset + 19 * alt, 93, 19);
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, LEVEL_DISABLED_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + yOffset + 19 * alt, 16, 16);
+                context.drawWrappedText(this.textRenderer, stringVisitable, n, height + yOffset + 1 + 19 * alt, p, ColorHelper.fullAlpha((q & 16711422) >> 1), false);
                 q = ColorHelper.fullAlpha(0xFF8C605D);
             } else {
                 //alternative available
                 int r = mouseX - (width + 60);
-                int s = mouseY - (height + 13 + 19 * alt);
+                int s = mouseY - (height + yOffset + 19 * alt);
 
                 if (r >= 0 && s >= 0 && r < 93 && s < 19) {
-                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_TEXTURE, m, height + 14 + 19 * alt, 93, 19);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_TEXTURE, m, height + yOffset + 19 * alt, 93, 19);
                     q = -128;
                 } else {
-                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_TEXTURE, m, height + 14 + 19 * alt, 93, 19);
+                    context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_TEXTURE, m, height + yOffset + 19 * alt, 93, 19);
                 }
 
-                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, LEVEL_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + 15 + 19 * alt, 16, 16);
+                context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, LEVEL_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + yOffset + 19 * alt, 16, 16);
                 context.drawWrappedText(this.textRenderer, stringVisitable, n, height + 16 + 19 * alt, p, q, false);
                 q = -8323296;
             }
 
-            context.drawTextWithShadow(this.textRenderer, stringLevel, n - 2 - this.textRenderer.getWidth(stringLevel), height + 16 + 19 * alt + 2, q);
+            context.drawTextWithShadow(this.textRenderer, stringLevel, n - 2 - this.textRenderer.getWidth(stringLevel), height + yOffset + 2 + 19 * alt + 2, q);
         }
         int k = 0;
         Identifier scrollHandle = this.canScroll ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, scrollHandle, width + 156, height + 14 + k + (int)(42 * this.scrollPosition), 12, 15);
+        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, scrollHandle, width + 156, height + yOffset + k + (int)(42 * this.scrollPosition), 12, 15);
         ci.cancel();
     }
 
@@ -240,30 +242,43 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
         return 93.0F;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/registry/Registry;getEntry(I)Ljava/util/Optional;"))
-    private void hintModifier(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci){
-        int j = (this.height - this.backgroundHeight) / 2;
-        this.toolTipNumber = this.visibleTopRow;
-        int relY = mouseY + j;
-        if (relY > 107) {
-            this.toolTipNumber++;
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void replaceRender(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        if (this.client != null) {
+            float f = this.client.getRenderTickCounter().getTickProgress(false);
+            super.render(context, mouseX, mouseY, f);
+            this.drawMouseoverTooltip(context, mouseX, mouseY);
         }
-        if (relY > 124) {
-            this.toolTipNumber++;
+        for(int j = 0; j < 3; ++j) {
+            int windowOffset = (this.height - this.backgroundHeight) / 2;
+            this.toolTipNumber = this.visibleTopRow;
+            int relY = mouseY - windowOffset;
+            if (relY > 32) {
+                this.toolTipNumber++;
+            }
+            if (relY > 51) {
+                this.toolTipNumber++;
+            }
+
+            this.checkEnchants();
+            if (this.isPointWithinBounds(61, 15 + 19 * j, 91, 17, mouseX, mouseY)) {
+                context.drawTooltip(this.textRenderer, this.alterTooltip(), mouseX, mouseY);
+                break;
+            }
         }
+        ci.cancel();
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;II)V"), index = 1)
-    private List<Text> alterTooltip(List<Text> text) {
+    @Unique
+    private List<Text> alterTooltip() {
+        List<Text> text = Lists.newArrayList();
         if (this.client == null || this.client.world == null) return text;
-        text.clear();
-        checkEnchants();
         Optional<RegistryEntry.Reference<Enchantment>> optional = this.client.world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getEntry(this.enchants[this.toolTipNumber]);
 
         if (optional.isPresent()) {
             checkBooks();
             Text enchant = Enchantment.getName(optional.get(), 0);
-            if (this.toolTipNumber+1 > this.bookCount) {
+            if (this.toolTipNumber + 1 > this.bookCount) {
                 text.addFirst(Text.translatable("container.enchant.clue", "").formatted(Formatting.WHITE));
             } else if (toolTipNumber == 0){
                 text.addFirst(Enchantment.getName(optional.get(), 1));
@@ -287,11 +302,5 @@ public abstract class EnchantmentScreenMixin extends HandledScreen<EnchantmentSc
             }
         }
         return text;
-    }
-
-    @ModifyArgs(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/EnchantmentScreen;isPointWithinBounds(IIIIDD)Z"))
-    private void changeBounds(Args args) {
-        args.set(0, 61);
-        args.set(2, 91);
     }
 }
