@@ -6,10 +6,11 @@
     "anvilmixins.anvilBalanceMixin",
     "armormixins.ArmorStatMixin",
     "armormixins.EquipTypeMixin",
-    "enchantingmixins.EnchantmentHelperMixin",
     "enchantingmixins.EnchantabilityMixin",
     "enchantingmixins.EnchantingScreenHandlerMixin",
+    "enchantingmixins.EnchantmentHelperMixin",
     "enchantingmixins.MendingMixin",
+    "enchantingmixins.ZombieFireSpreadMixin",
     "gearprogressionmixins.ItemMaterialMixin",
     "gearprogressionmixins.ToolMaterialMixin"
   ],

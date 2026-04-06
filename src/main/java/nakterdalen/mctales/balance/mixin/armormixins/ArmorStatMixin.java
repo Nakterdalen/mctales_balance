@@ -69,7 +69,7 @@ public interface ArmorStatMixin {
         return original.call(ArmorStats.IRON_DURABILITY, newMap, Enchantability.IRON_ENCHANTABILITY, equipSound, 0f, knockbackResistance, repairIngredient, modelId);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "(ILjava/util/Map;ILnet/minecraft/registry/entry/RegistryEntry;FFLnet/minecraft/registry/tag/TagKey;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/item/equipment/ArmorMaterial;", ordinal = 4))
+    @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "(ILjava/util/Map;ILnet/minecraft/registry/entry/RegistryEntry;FFLnet/minecraft/registry/tag/TagKey;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/item/equipment/ArmorMaterial;", ordinal = 7))
     private static ArmorMaterial changeNetherite(int durability, Map<EquipmentType, Integer> old_map, int enchantmentValue, RegistryEntry<SoundEvent> equipSound, float toughness, float knockbackResistance, TagKey repairIngredient, RegistryKey modelId, Operation<ArmorMaterial> original) {
         Map<EquipmentType, Object> newMap = Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
             map.put(EquipmentType.BOOTS, ArmorStats.NETHERITE_BOOTS_PROTECTION);
@@ -93,7 +93,7 @@ public interface ArmorStatMixin {
         return original.call(ArmorStats.DIAMOND_DURABILITY, newMap, Enchantability.DIAMOND_ENCHANTABILITY, equipSound, 0f, knockbackResistance, repairIngredient, modelId);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "(ILjava/util/Map;ILnet/minecraft/registry/entry/RegistryEntry;FFLnet/minecraft/registry/tag/TagKey;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/item/equipment/ArmorMaterial;", ordinal = 6))
+    @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "(ILjava/util/Map;ILnet/minecraft/registry/entry/RegistryEntry;FFLnet/minecraft/registry/tag/TagKey;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/item/equipment/ArmorMaterial;", ordinal = 4))
     private static ArmorMaterial changeGold(int durability, Map<EquipmentType, Integer> old_map, int enchantmentValue, RegistryEntry<SoundEvent> equipSound, float toughness, float knockbackResistance, TagKey repairIngredient, RegistryKey modelId, Operation<ArmorMaterial> original) {
         Map<EquipmentType, Object> newMap = Util.make(new EnumMap<>(EquipmentType.class), (map) -> {
             map.put(EquipmentType.BOOTS, ArmorStats.GOLD_BOOTS_PROTECTION);
@@ -105,7 +105,7 @@ public interface ArmorStatMixin {
         return original.call(ArmorStats.GOLD_DURABILITY, newMap, Enchantability.GOLD_ENCHANTABILITY, equipSound, 0f, knockbackResistance, repairIngredient, modelId);
     }
 
-    @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "(ILjava/util/Map;ILnet/minecraft/registry/entry/RegistryEntry;FFLnet/minecraft/registry/tag/TagKey;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/item/equipment/ArmorMaterial;", ordinal = 7))
+    @WrapOperation(method = "<clinit>", at = @At(value = "NEW", target = "(ILjava/util/Map;ILnet/minecraft/registry/entry/RegistryEntry;FFLnet/minecraft/registry/tag/TagKey;Lnet/minecraft/registry/RegistryKey;)Lnet/minecraft/item/equipment/ArmorMaterial;", ordinal = 6))
     private static ArmorMaterial changeTurtle(int durability, Map<EquipmentType, Integer> old_map, int enchantmentValue, RegistryEntry<SoundEvent> equipSound, float toughness, float knockbackResistance, TagKey repairIngredient, RegistryKey modelId, Operation<ArmorMaterial> original) {
         return original.call(ArmorStats.TURTLE_DURABILITY, old_map, Enchantability.TURTLE_ENCHANTABILITY, equipSound, 0f, knockbackResistance, repairIngredient, modelId);
     }
