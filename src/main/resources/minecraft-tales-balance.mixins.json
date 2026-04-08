@@ -9,6 +9,7 @@
     "enchantingmixins.EnchantabilityMixin",
     "enchantingmixins.EnchantingScreenHandlerMixin",
     "enchantingmixins.EnchantmentHelperMixin",
+    "enchantingmixins.ExperienceLevelMixin",
     "enchantingmixins.MendingMixin",
     "enchantingmixins.ZombieFireSpreadMixin",
     "gearprogressionmixins.ItemMaterialMixin",
