@@ -182,7 +182,6 @@ public abstract class EnchantingScreenHandlerMixin extends AbstractContainerMenu
     private int modifyLevel(int value) {
         return 10;
     }
-
      */
 
     @Override
