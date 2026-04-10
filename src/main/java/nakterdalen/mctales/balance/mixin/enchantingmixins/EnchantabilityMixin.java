@@ -1,9 +1,9 @@
 package nakterdalen.mctales.balance.mixin.enchantingmixins;
 
 import nakterdalen.mctales.balance.enchanting.Enchantability;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,23 +25,23 @@ public class EnchantabilityMixin {
     }
     */
 
-    @Inject(method = "register(Ljava/lang/String;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", at = @At("HEAD"))
-    private static void register1(String id, Item.Settings settings, CallbackInfoReturnable<Item> cir){
+    @Inject(method = "registerItem(Ljava/lang/String;Lnet/minecraft/world/item/Item$Properties;)Lnet/minecraft/world/item/Item;", at = @At("HEAD"))
+    private static void register1(String id, Item.Properties settings, CallbackInfoReturnable<Item> cir){
         addEnchantability(id, settings);
     }
 
-    @Inject(method = "register(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", at = @At("HEAD"))
-    private static void register2(String id, Function<Item.Settings, Item> factory, Item.Settings settings, CallbackInfoReturnable<Item> cir){
+    @Inject(method = "registerItem(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/world/item/Item$Properties;)Lnet/minecraft/world/item/Item;", at = @At("HEAD"))
+    private static void register2(String id, Function<Item.Properties, Item> factory, Item.Properties settings, CallbackInfoReturnable<Item> cir){
         addEnchantability(id, settings);
     }
 
-    @Inject(method = "register(Lnet/minecraft/registry/RegistryKey;Ljava/util/function/Function;Lnet/minecraft/item/Item$Settings;)Lnet/minecraft/item/Item;", at = @At("HEAD"))
-    private static void register3(RegistryKey<Item> key, Function<Item.Settings, Item> factory, Item.Settings settings, CallbackInfoReturnable<Item> cir){
-        addEnchantability(key.getValue().getNamespace(), settings);
+    @Inject(method = "registerItem(Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Function;Lnet/minecraft/world/item/Item$Properties;)Lnet/minecraft/world/item/Item;", at = @At("HEAD"))
+    private static void register3(ResourceKey<Item> key, Function<Item.Properties, Item> factory, Item.Properties settings, CallbackInfoReturnable<Item> cir){
+        addEnchantability(key.location().getNamespace(), settings);
     }
 
     @Unique
-    private static void addEnchantability(String id, Item.Settings settings) {
+    private static void addEnchantability(String id, Item.Properties settings) {
         if (id.equals("bow")) {
             settings.enchantable(Enchantability.BOW_ENCHANTABILITY);
         }

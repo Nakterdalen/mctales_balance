@@ -3,28 +3,32 @@ package nakterdalen.mctales.balance.mixin.enchantingmixins;
 
 import nakterdalen.mctales.balance.enchanting.BalancedEnchantmentHelper;
 import nakterdalen.mctales.balance.enchanting.IEnchantingHandler;
-import net.minecraft.advancement.criterion.Criteria;
-import net.minecraft.block.EnchantingTableBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentLevelEntry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.EnchantmentTags;
-import net.minecraft.screen.*;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
-import net.minecraft.util.collection.IndexedIterable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.IdMap;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.tags.EnchantmentTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.EnchantmentMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.level.block.EnchantingTableBlock;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
@@ -34,33 +38,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.*;
 
 
-@Mixin(EnchantmentScreenHandler.class)
-public abstract class EnchantingScreenHandlerMixin extends ScreenHandler implements IEnchantingHandler {
+@Mixin(EnchantmentMenu.class)
+public abstract class EnchantingScreenHandlerMixin extends AbstractContainerMenu implements IEnchantingHandler {
 
     @Shadow
     @Final
-    private ScreenHandlerContext context;
+    private ContainerLevelAccess access;
 
     @Shadow
     @Final
-    private Property seed;
+    private DataSlot enchantmentSeed;
 
     @Shadow
-    public void onContentChanged(Inventory inventory) {}
+    public void slotsChanged(Container inventory) {}
 
     @Shadow
     @Final
-    private Inventory inventory;
+    private Container enchantSlots;
 
     @Unique
-    public List<List<EnchantmentLevelEntry>> newEnchantmentList = new LinkedList<>();
+    public List<List<EnchantmentInstance>> newEnchantmentList = new LinkedList<>();
 
     @Unique int[] enchantArray = new int[10];
 
     @Unique
-    final Property bookCount = Property.create();
+    final DataSlot bookCount = DataSlot.standalone();
 
-    @Shadow @Final private Random random;
+    @Shadow @Final private RandomSource random;
 
     @Unique
     public Runnable activateScroll = () -> {};
@@ -69,20 +73,21 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
     @Unique
     public Runnable transferEnchants = () -> {};
 
-    protected EnchantingScreenHandlerMixin(@Nullable ScreenHandlerType<?> type, int syncId) {
+    protected EnchantingScreenHandlerMixin(@Nullable MenuType<?> type, int syncId) {
         super(type, syncId);
     }
 
-    @Inject(method = "<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V", at = @At("TAIL"))
-    private void injectConstructor(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, CallbackInfo ci) {
+    @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("TAIL"))
+    private void injectConstructor(int syncId, Inventory playerInventory, ContainerLevelAccess context, CallbackInfo ci) {
         for (int i = 0; i < 10; i++) {
-            this.addProperty(Property.create(this.enchantArray, i));
+            this.addDataSlot(DataSlot.shared(this.enchantArray, i));
         }
-        this.addProperty(this.bookCount).set(0);
+        this.addDataSlot(this.bookCount).set(0);
+        this.slotsChanged(this.enchantSlots);
     }
 
-    @Inject(method = "onButtonClick", at = @At(value = "HEAD"), cancellable = true)
-    private void buttonClick(PlayerEntity player, int id, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "clickMenuButton", at = @At(value = "HEAD"), cancellable = true)
+    private void buttonClick(Player player, int id, CallbackInfoReturnable<Boolean> cir) {
         int numberOfEnchants = 10;
         for (int i = 1; i <= 10; i++) {
             if (this.enchantArray[i-1] == -1) {
@@ -91,38 +96,38 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
             }
         }
 
-        ItemStack enchantItem = this.inventory.getStack(0);
-        ItemStack lapis = this.inventory.getStack(1);
+        ItemStack enchantItem = this.enchantSlots.getItem(0);
+        ItemStack lapis = this.enchantSlots.getItem(1);
 
         boolean buttonValid = id >= 0 && id <= numberOfEnchants - 1;
         boolean validEnchantItem = enchantItem.isEnchantable();
-        boolean lapisRequirement = player.isInCreativeMode() || (id + 1 <= lapis.getCount());
-        boolean levelRequirement = player.isInCreativeMode() || (id + 1 <= player.experienceLevel);
-        if (!(player instanceof ServerPlayerEntity)) {
+        boolean lapisRequirement = player.hasInfiniteMaterials() || (id + 1 <= lapis.getCount());
+        boolean levelRequirement = player.hasInfiniteMaterials() || (id + 1 <= player.experienceLevel);
+        if (!(player instanceof ServerPlayer)) {
             cir.setReturnValue(Boolean.TRUE);
         }
 
         if (buttonValid && validEnchantItem && lapisRequirement && levelRequirement) {
-            this.context.run((world, pos) -> {
+            this.access.execute((world, pos) -> {
                 if (!this.newEnchantmentList.isEmpty() && !this.newEnchantmentList.get(id).isEmpty()) {
 
-                    player.applyEnchantmentCosts(enchantItem, id + 1);
-                    if (enchantItem.isOf(Items.BOOK)) enchantItem.withItem(Items.ENCHANTED_BOOK);
+                    player.onEnchantmentPerformed(enchantItem, id + 1);
+                    if (enchantItem.is(Items.BOOK)) enchantItem.transmuteCopy(Items.ENCHANTED_BOOK);
 
-                    for (EnchantmentLevelEntry entry : this.newEnchantmentList.get(id)) {
-                        enchantItem.addEnchantment(entry.enchantment(), entry.level());
+                    for (EnchantmentInstance entry : this.newEnchantmentList.get(id)) {
+                        enchantItem.enchant(entry.enchantment(), entry.level());
                     }
 
-                    lapis.decrementUnlessCreative(id + 1, player);
+                    lapis.consume(id + 1, player);
 
-                    player.incrementStat(Stats.ENCHANT_ITEM);
-                    if (player instanceof ServerPlayerEntity) {
-                        Criteria.ENCHANTED_ITEM.trigger((ServerPlayerEntity)player, enchantItem, id + 1);
+                    player.awardStat(Stats.ENCHANT_ITEM);
+                    if (player instanceof ServerPlayer) {
+                        CriteriaTriggers.ENCHANTED_ITEM.trigger((ServerPlayer)player, enchantItem, id + 1);
                     }
-                    this.inventory.markDirty();
-                    this.seed.set(player.getEnchantingTableSeed());
-                    this.onContentChanged(this.inventory);
-                    world.playSound(null, pos, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 1.0F, world.random.nextFloat() * 0.1F + 0.9F);
+                    this.enchantSlots.setChanged();
+                    this.enchantmentSeed.set(player.getEnchantmentSeed());
+                    this.slotsChanged(this.enchantSlots);
+                    world.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1.0F, world.random.nextFloat() * 0.1F + 0.9F);
                     cir.setReturnValue(Boolean.TRUE);
                 } else  {
                     cir.setReturnValue(Boolean.FALSE);
@@ -133,24 +138,24 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
         }
     }
 
-    @Inject(method = "onContentChanged", at = @At("TAIL"))
-    private void updateActivateScroll(Inventory inventory, CallbackInfo ci) {
+    @Inject(method = "slotsChanged", at = @At("TAIL"))
+    private void updateSlot(Container inventory, CallbackInfo ci) {
         activateScroll.run();
-        this.context.run((world, pos) -> {
+        this.access.execute((world, pos) -> {
             int count = 0;
-            for (BlockPos blockPos : EnchantingTableBlock.POWER_PROVIDER_OFFSETS) {
-                if (EnchantingTableBlock.canAccessPowerProvider(world, pos, blockPos)) {
+            for (BlockPos blockPos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+                if (EnchantingTableBlock.isValidBookShelf(world, pos, blockPos)) {
                     count++;
                 }
             }
             this.bookCount.set(count/3);
             bookCounter.run();
-            this.sendContentUpdates();
-            ItemStack enchantItem = inventory.getStack(0);
-            Optional<RegistryEntryList.Named<Enchantment>> optional = world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getOptional(EnchantmentTags.IN_ENCHANTING_TABLE);
+            this.broadcastChanges();
+            ItemStack enchantItem = inventory.getItem(0);
+            Optional<HolderSet.Named<Enchantment>> optional = world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(EnchantmentTags.IN_ENCHANTING_TABLE);
+            this.newEnchantmentList.clear();
             if (!enchantItem.isEmpty() && enchantItem.isEnchantable() && optional.isPresent()) {
-                this.newEnchantmentList.clear();
-                int level = Objects.requireNonNull(enchantItem.get(DataComponentTypes.ENCHANTABLE)).value();
+                int level = Objects.requireNonNull(enchantItem.get(DataComponents.ENCHANTABLE)).value();
                 for (int i = 1; i <= level; i++) {
                     this.newEnchantmentList.add(BalancedEnchantmentHelper.generateEnchantments(this.random, i, enchantItem, optional.get()));
                 }
@@ -159,8 +164,8 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
             for (int i = 0; i < 10; i++) {
 
                 if (i < this.newEnchantmentList.size()) {
-                    IndexedIterable<RegistryEntry<Enchantment>> indexedIterable = world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT).getIndexedEntries();
-                    this.enchantArray[i] = indexedIterable.getRawId(this.newEnchantmentList.get(i).getFirst().enchantment());
+                    IdMap<Holder<Enchantment>> indexedIterable = world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
+                    this.enchantArray[i] = indexedIterable.getId(this.newEnchantmentList.get(i).getFirst().enchantment());
                 } else {
                     this.enchantArray[i] = -1;
                 }
@@ -168,14 +173,17 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
             transferEnchants.run();
         });
         bookCounter.run();
-        this.sendContentUpdates();
+        this.broadcastChanges();
     }
 
     //ought to try to figure out why I do this
-    @ModifyVariable(method = "generateEnchantments", at = @At(value = "INVOKE", target = "Lnet/minecraft/enchantment/EnchantmentHelper;generateEnchantments(Lnet/minecraft/util/math/random/Random;Lnet/minecraft/item/ItemStack;ILjava/util/stream/Stream;)Ljava/util/List;"), index = 3, argsOnly = true)
+    /*
+    @ModifyVariable(method = "getEnchantmentList", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;selectEnchantment(Lnet/minecraft/util/RandomSource;Lnet/minecraft/world/item/ItemStack;ILjava/util/stream/Stream;)Ljava/util/List;"), index = 3, argsOnly = true)
     private int modifyLevel(int value) {
         return 10;
     }
+
+     */
 
     @Override
     public void balance$setEnchantingListener(Runnable activateScroll) {
@@ -193,13 +201,13 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
 
     @Override
     public int balance$getCount() {
-        this.sendContentUpdates();
+        this.broadcastChanges();
         return this.bookCount.get();
     }
 
     @Override
     public int[] balance$transferEnchants() {
-        this.sendContentUpdates();
+        this.broadcastChanges();
         return this.enchantArray;
     }
 

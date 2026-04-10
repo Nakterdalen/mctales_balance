@@ -3,24 +3,23 @@ package nakterdalen.mctales.balance.mixin.foodmixins;
 
 import nakterdalen.mctales.balance.food.BalancedFoodManager;
 import nakterdalen.mctales.balance.food.IFoodSaver;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.WriteView;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerPlayerEntity.class)
+@Mixin(ServerPlayer.class)
 public abstract class FoodSaverMixin implements IFoodSaver {
 
-    private NbtCompound persistentData;
+    private CompoundTag persistentData;
 
     @Override
-    public NbtCompound balance$getPersistentData() {
+    public CompoundTag balance$getPersistentData() {
 
         if(this.persistentData == null) {
-            this.persistentData = new NbtCompound();
+            this.persistentData = new CompoundTag();
         }
         return persistentData;
     }

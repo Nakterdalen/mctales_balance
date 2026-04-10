@@ -1,9 +1,9 @@
 package nakterdalen.mctales.balance.food;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public interface IFoodSaver {
 
-    NbtCompound balance$getPersistentData();
+    CompoundTag balance$getPersistentData();
 
 }

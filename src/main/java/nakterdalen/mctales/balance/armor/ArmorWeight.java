@@ -1,9 +1,9 @@
 package nakterdalen.mctales.balance.armor;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 public class ArmorWeight {
 

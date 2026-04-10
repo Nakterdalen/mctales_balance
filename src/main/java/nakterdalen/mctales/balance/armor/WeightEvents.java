@@ -2,11 +2,11 @@ package nakterdalen.mctales.balance.armor;
 
 import nakterdalen.mctales.balance.MinecraftTalesBalance;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 public class WeightEvents {
 
@@ -15,17 +15,17 @@ public class WeightEvents {
     public static void registerWeightEvents() {
         DefaultItemComponentEvents.MODIFY.register(context -> context.modify(
                 ArmorWeight.WEIGHT_MAP.keySet()::contains, (builder, item) -> {
-                    AttributeModifiersComponent component = item.getComponents().get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
-                    AttributeModifiersComponent.Builder componentBuilder = AttributeModifiersComponent.builder();
+                    ItemAttributeModifiers component = item.components().get(DataComponents.ATTRIBUTE_MODIFIERS);
+                    ItemAttributeModifiers.Builder componentBuilder = ItemAttributeModifiers.builder();
                     if (component == null) {
                         return;
                     }
-                    for (AttributeModifiersComponent.Entry entry : component.modifiers()) {
+                    for (ItemAttributeModifiers.Entry entry : component.modifiers()) {
                         componentBuilder.add(entry.attribute(),entry.modifier(), entry.slot());
                     }
-                    builder.add(DataComponentTypes.ATTRIBUTE_MODIFIERS, componentBuilder
-                            .add(EntityAttributes.MOVEMENT_SPEED,
-                                    new EntityAttributeModifier(Identifier.of(MOD_ID, "movement_penalty"), ArmorWeight.getArmorWeight(item), EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                    builder.set(DataComponents.ATTRIBUTE_MODIFIERS, componentBuilder
+                            .add(Attributes.MOVEMENT_SPEED,
+                                    new AttributeModifier(ResourceLocation.fromNamespaceAndPath(MOD_ID, "movement_penalty"), ArmorWeight.getArmorWeight(item), AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                                     component.modifiers().getFirst().slot())
                             .build());}));
     }

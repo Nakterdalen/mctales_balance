@@ -2,10 +2,9 @@ package nakterdalen.mctales.balance.food;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.StringIdentifiable;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.util.StringRepresentable;
 
 public class BalancedFoodManager {
 
@@ -38,16 +37,16 @@ public class BalancedFoodManager {
             Codec.intRange(0, 20).fieldOf("exhaustion").forGetter(BalancedFoodManager::getExhaustion)
     ).apply(instance, BalancedFoodManager::new));
 
-    public enum FoodType implements StringIdentifiable{
+    public enum FoodType implements StringRepresentable{
         NONE,
         MEAT,
         GRAIN,
         VEGETABLE;
 
-        public static final StringIdentifiable.EnumCodec<FoodType> CODEC = StringIdentifiable.createCodec(FoodType::values);
+        public static final EnumCodec<FoodType> CODEC = StringRepresentable.fromEnum(FoodType::values);
 
         @Override
-        public String asString() {
+        public String getSerializedName() {
             return this.toString();
         }
     }
