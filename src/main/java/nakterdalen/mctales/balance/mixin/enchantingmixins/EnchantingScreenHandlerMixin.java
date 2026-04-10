@@ -43,7 +43,7 @@ public abstract class EnchantingScreenHandlerMixin extends ScreenHandler impleme
 
     @Shadow
     @Final
-    private final Property seed = Property.create();
+    private Property seed;
 
     @Shadow
     public void onContentChanged(Inventory inventory) {}
