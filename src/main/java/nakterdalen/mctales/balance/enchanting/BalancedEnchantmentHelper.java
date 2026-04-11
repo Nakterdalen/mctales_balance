@@ -15,6 +15,9 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 
 public class BalancedEnchantmentHelper {
 
+    private static final float HIGHERLEVELCHANCE = 0.5f;
+    private static final float HIGHERLEVELBOOKCHANCE = 0.9f;
+
     public static int getEnchantmentlevels(ItemStack item) {
         int level = 0;
         for (Holder<Enchantment> entry : EnchantmentHelper.getEnchantmentsForCrafting(item).keySet()) {
@@ -51,10 +54,7 @@ public class BalancedEnchantmentHelper {
             enchantList.forEach((entry) ->probList.add(random.nextFloat()));
             boolean hasAdded = false;
             for (int i = 0; i < enchantList.size(); i++) {
-                float probIncrease = stack.is(Items.BOOK) ? 1.0f : 0.7f;
-                if (level == 3 && enchantList.get(i).enchantment().value().getMaxLevel() == 1) {
-                    System.out.println("We are testing books: " + enchantList.get(i).enchantment().value().toString());
-                }
+                float probIncrease = stack.is(Items.BOOK) ? HIGHERLEVELBOOKCHANCE : HIGHERLEVELCHANCE;
                 if (enchantList.get(i).enchantment().value().getMaxLevel() != enchantList.get(i).level()) {
                     if (probList.get(i) <= probIncrease) {
                         enchantList.set(i, new EnchantmentInstance(enchantList.get(i).enchantment(), enchantList.get(i).level()+1));
