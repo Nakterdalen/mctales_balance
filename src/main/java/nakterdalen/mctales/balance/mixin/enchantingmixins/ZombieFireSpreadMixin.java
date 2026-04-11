@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 
@@ -15,14 +15,14 @@ import net.minecraft.world.item.enchantment.Enchantments;
 public abstract class ZombieFireSpreadMixin {
 
     @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
-    private void fireProtectionBuff(Entity instance, float seconds) {
+    private void fireProtectionBuff(Entity instance, float numberOfSeconds) {
 
         AtomicInteger levelFireProt = new AtomicInteger(0);
 
         if (instance instanceof LivingEntity) {
 
 
-            EnchantmentHelper.runIterationOnEquipment((LivingEntity) instance, ((enchantment, level, context) -> {
+            EnchantmentHelper.runIterationOnEquipment((LivingEntity) instance, ((enchantment, level, _) -> {
                 if (enchantment.is(Enchantments.FIRE_PROTECTION)) {
                     levelFireProt.addAndGet(level);
                 }
@@ -30,8 +30,7 @@ public abstract class ZombieFireSpreadMixin {
         }
 
         if (instance.getRandom().nextFloat() > 0.1f * levelFireProt.get()) {
-            System.out.println("Procced with probability of: " + 0.1f * levelFireProt.get());
-            instance.igniteForSeconds(seconds);
+            instance.igniteForSeconds(numberOfSeconds);
         }
     }
 

@@ -3,7 +3,7 @@ package nakterdalen.mctales.balance.armor;
 import nakterdalen.mctales.balance.MinecraftTalesBalance;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -25,7 +25,7 @@ public class WeightEvents {
                     }
                     builder.set(DataComponents.ATTRIBUTE_MODIFIERS, componentBuilder
                             .add(Attributes.MOVEMENT_SPEED,
-                                    new AttributeModifier(ResourceLocation.fromNamespaceAndPath(MOD_ID, "movement_penalty"), ArmorWeight.getArmorWeight(item), AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
+                                    new AttributeModifier(Identifier.fromNamespaceAndPath(MOD_ID, "movement_penalty"), ArmorWeight.getArmorWeight(item), AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                                     component.modifiers().getFirst().slot())
                             .build());}));
     }

@@ -30,6 +30,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.block.EnchantingTableBlock;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -50,7 +51,7 @@ public abstract class EnchantingScreenHandlerMixin extends AbstractContainerMenu
     private DataSlot enchantmentSeed;
 
     @Shadow
-    public void slotsChanged(Container inventory) {}
+    public void slotsChanged(@NonNull Container container) {}
 
     @Shadow
     @Final
@@ -127,7 +128,7 @@ public abstract class EnchantingScreenHandlerMixin extends AbstractContainerMenu
                     this.enchantSlots.setChanged();
                     this.enchantmentSeed.set(player.getEnchantmentSeed());
                     this.slotsChanged(this.enchantSlots);
-                    world.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1.0F, world.random.nextFloat() * 0.1F + 0.9F);
+                    world.playSound(null, pos, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 1.0F, world.getRandom().nextFloat() * 0.1F + 0.9F);
                     cir.setReturnValue(Boolean.TRUE);
                 } else  {
                     cir.setReturnValue(Boolean.FALSE);

@@ -3,10 +3,10 @@ package nakterdalen.mctales.balance.mixin.client;
 import com.google.common.collect.Lists;
 import nakterdalen.mctales.balance.enchanting.IEnchantingHandler;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
-
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Holder;
@@ -18,10 +18,11 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.enchantment.Enchantment;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -32,37 +33,37 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Mixin(net.minecraft.client.gui.screens.inventory.EnchantmentScreen.class)
+@Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
 
     @Final
     @Shadow
-    protected abstract void renderBook(GuiGraphics guiGraphics, int x, int y);
+    protected abstract void extractBook(GuiGraphicsExtractor graphics, int left, int top);
 
     @Unique
-    private static final ResourceLocation[] LEVEL_TEXTURES = new ResourceLocation[]{ResourceLocation.withDefaultNamespace("container/enchanting_table/level_1"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_2"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_3"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_4"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_5")};
+    private static final Identifier[] LEVEL_TEXTURES = new Identifier[]{Identifier.withDefaultNamespace("container/enchanting_table/level_1"), Identifier.withDefaultNamespace("container/enchanting_table/level_2"), Identifier.withDefaultNamespace("container/enchanting_table/level_3"), Identifier.withDefaultNamespace("container/enchanting_table/level_4"), Identifier.withDefaultNamespace("container/enchanting_table/level_5")};
     @Unique
-    private static final ResourceLocation[] LEVEL_DISABLED_TEXTURES = new ResourceLocation[]{ResourceLocation.withDefaultNamespace("container/enchanting_table/level_1_disabled"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_2_disabled"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_3_disabled"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_4_disabled"), ResourceLocation.withDefaultNamespace("container/enchanting_table/level_5_disabled")};
+    private static final Identifier[] LEVEL_DISABLED_TEXTURES = new Identifier[]{Identifier.withDefaultNamespace("container/enchanting_table/level_1_disabled"), Identifier.withDefaultNamespace("container/enchanting_table/level_2_disabled"), Identifier.withDefaultNamespace("container/enchanting_table/level_3_disabled"), Identifier.withDefaultNamespace("container/enchanting_table/level_4_disabled"), Identifier.withDefaultNamespace("container/enchanting_table/level_5_disabled")};
     @Final
     @Shadow
-    private static ResourceLocation ENCHANTMENT_SLOT_DISABLED_SPRITE;
+    private static Identifier ENCHANTMENT_SLOT_DISABLED_SPRITE;
     @Final
     @Shadow
-    private static ResourceLocation ENCHANTMENT_SLOT_HIGHLIGHTED_SPRITE;
+    private static Identifier ENCHANTMENT_SLOT_HIGHLIGHTED_SPRITE;
     @Final
     @Shadow
-    private static ResourceLocation ENCHANTMENT_SLOT_SPRITE;
+    private static Identifier ENCHANTMENT_SLOT_SPRITE;
     @Final
     @Shadow
-    private static ResourceLocation ENCHANTING_TABLE_LOCATION;
+    private static Identifier ENCHANTING_TABLE_LOCATION;
 
     @Shadow
     protected abstract void init();
 
     @Unique
-    private static final ResourceLocation SCROLLER_TEXTURE = ResourceLocation.withDefaultNamespace("container/loom/scroller");
+    private static final Identifier SCROLLER_TEXTURE = Identifier.withDefaultNamespace("container/loom/scroller");
     @Unique
-    private static final ResourceLocation SCROLLER_DISABLED_TEXTURE = ResourceLocation.withDefaultNamespace("container/loom/scroller_disabled");
+    private static final Identifier SCROLLER_DISABLED_TEXTURE = Identifier.withDefaultNamespace("container/loom/scroller_disabled");
 
     @Unique
     private float scrollPosition;
@@ -85,7 +86,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     private int[] enchants;
 
     public EnchantmentScreenMixin(EnchantmentMenu enchantmentMenu, Inventory inventory, Component component) {
-        super((EnchantmentMenu ) enchantmentMenu, inventory, component);
+        super(enchantmentMenu, inventory, component);
     }
 
     @Unique
@@ -110,21 +111,21 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
 
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void injectConstructor(EnchantmentMenu enchantmentMenu, Inventory inventory, Component component, CallbackInfo ci) {
+    private void injectConstructor(EnchantmentMenu menu, Inventory inventory, Component title, CallbackInfo ci) {
         scrollPosition = 0f;
         scrollBarClicked = false;
         canScroll = false;
         bookCount = 0;
-        ((IEnchantingHandler) enchantmentMenu).balance$setEnchantingListener(this::checkScroll);
-        ((IEnchantingHandler) enchantmentMenu).balance$getBookCount(this::checkBooks);
-        ((IEnchantingHandler) enchantmentMenu).balance$getEnchants(this::checkEnchants);
+        ((IEnchantingHandler) menu).balance$setEnchantingListener(this::checkScroll);
+        ((IEnchantingHandler) menu).balance$getBookCount(this::checkBooks);
+        ((IEnchantingHandler) menu).balance$getEnchants(this::checkEnchants);
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"))
-    private void addToMouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
+    private void addToMouseClicked(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
         this.scrollBarClicked = false;
-        double xval = mouseButtonEvent.x() - (double) (this.width - this.imageWidth) / 2;
-        double yval = mouseButtonEvent.y() - (double) (this.height - this.imageHeight) / 2;
+        double xval = event.x() - (double) (this.width - this.imageWidth) / 2;
+        double yval = event.y() - (double) (this.height - this.imageHeight) / 2;
         if (xval > 156 && xval < 168 && yval > 14 + 42*scrollPosition && yval < 29 + 42*scrollPosition) {
             this.scrollBarClicked = true;
         }
@@ -136,7 +137,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         return syncId + this.visibleTopRow;
     }
 
-    public boolean mouseDragged(MouseButtonEvent click, double offsetX, double offsetY) {
+    public boolean mouseDragged(@NonNull MouseButtonEvent click, double offsetX, double offsetY) {
         int i = this.enchantNumber - 3;
         if (this.scrollBarClicked && this.canScroll && i > 0) {
             int j = this.topPos + 13;
@@ -163,15 +164,15 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         return true;
     }
 
-    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
-    private void newBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
+    private void newBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
         //much copied
         int width = (this.width - this.imageWidth) / 2;
         int height = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ENCHANTING_TABLE_LOCATION, width, height, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ENCHANTING_TABLE_LOCATION, width, height, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
 
-        this.renderBook(guiGraphics, width, height);
-        EnchantmentNames.getInstance().initSeed((long)((EnchantmentMenu)this.menu).getEnchantmentSeed());
+        this.extractBook(graphics, width, height);
+        EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int lapisCount = this.menu.getGoldCount();
 
         ItemStack enchantingStack = this.menu.slots.getFirst().getItem();
@@ -209,32 +210,32 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             int q = -9937334;
             if ((lapisCount < topRow + alt + 1 || Objects.requireNonNull(Objects.requireNonNull(this.minecraft).player).experienceLevel < xpLevel) && !Objects.requireNonNull(Objects.requireNonNull(this.minecraft).player).hasInfiniteMaterials()) {
                 //alternative not available
-                guiGraphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_SPRITE, m, height + yOffset + 19 * alt, 93, 19);
-                guiGraphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, LEVEL_DISABLED_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + yOffset + 19 * alt, 16, 16);
-                guiGraphics.drawWordWrap(this.font, stringVisitable, n, height + yOffset + 1 + 19 * alt, p, ARGB.opaque((q & 16711422) >> 1), false);
+                graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_SPRITE, m, height + yOffset + 19 * alt, 93, 19);
+                graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, LEVEL_DISABLED_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + yOffset + 19 * alt, 16, 16);
+                graphics.textWithWordWrap(this.font, stringVisitable, n, height + yOffset + 1 + 19 * alt, p, ARGB.opaque((q & 16711422) >> 1), false);
                 q = ARGB.opaque(0xFF8C605D);
             } else {
                 //alternative available
-                int r = this.width - (width + 60);
-                int s = this.height - (height + yOffset + 19 * alt);
+                int r = mouseX - (width + 60);
+                int s = mouseY - (height + yOffset + 19 * alt);
 
                 if (r >= 0 && s >= 0 && r < 93 && s < 19) {
-                    guiGraphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_SPRITE, m, height + yOffset + 19 * alt, 93, 19);
+                    graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_HIGHLIGHTED_SPRITE, m, height + yOffset + 19 * alt, 93, 19);
                     q = -128;
                 } else {
-                    guiGraphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_SPRITE, m, height + yOffset + 19 * alt, 93, 19);
+                    graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_SPRITE, m, height + yOffset + 19 * alt, 93, 19);
                 }
 
-                guiGraphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, LEVEL_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + yOffset + 19 * alt, 16, 16);
-                guiGraphics.drawWordWrap(this.font, stringVisitable, n, height + 16 + 19 * alt, p, q, false);
+                graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, LEVEL_TEXTURES[Math.min(alt+topRow, 4)], m + 1, height + yOffset + 19 * alt, 16, 16);
+                graphics.textWithWordWrap(this.font, stringVisitable, n, height + 16 + 19 * alt, p, q, false);
                 q = -8323296;
             }
 
-            guiGraphics.drawString(this.font, stringLevel, n - 2 - this.font.width(stringLevel), height + yOffset + 2 + 19 * alt + 2, q);
+            graphics.text(this.font, stringLevel, n - 2 - this.font.width(stringLevel), height + yOffset + 2 + 19 * alt + 2, q);
         }
         int k = 0;
-        ResourceLocation scrollHandle = this.canScroll ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
-        guiGraphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, scrollHandle, width + 156, height + yOffset + k + (int)(42 * this.scrollPosition), 12, 15);
+        Identifier scrollHandle = this.canScroll ? SCROLLER_TEXTURE : SCROLLER_DISABLED_TEXTURE;
+        graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, scrollHandle, width + 156, height + yOffset + k + (int)(42 * this.scrollPosition), 12, 15);
         ci.cancel();
     }
 
@@ -243,13 +244,11 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         return 93.0F;
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void replaceRender(GuiGraphics guiGraphics, int mouseX, int mouseY, float f, CallbackInfo ci) {
-        if (this.minecraft != null) {
-            float g = this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-            super.render(guiGraphics, mouseX, mouseY, g);
-            this.renderTooltip(guiGraphics, mouseX, mouseY);
-        }
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    private void replaceRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float ignored, CallbackInfo ci) {
+        float g = this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        super.extractRenderState(graphics, mouseX, mouseY, g);
+        this.extractTooltip(graphics, mouseX, mouseY);
         for(int j = 0; j < 3; ++j) {
             int windowOffset = (this.height - this.imageHeight) / 2;
             this.toolTipNumber = this.visibleTopRow;
@@ -263,7 +262,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
 
             this.checkEnchants();
             if (this.isHovering(61, 15 + 19 * j, 91, 17, mouseX, mouseY)) {
-                guiGraphics.setComponentTooltipForNextFrame(this.font, this.alterTooltip(), mouseX, mouseY);
+                graphics.setComponentTooltipForNextFrame(this.font, this.alterTooltip(), mouseX, mouseY);
                 break;
             }
         }
@@ -273,7 +272,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     @Unique
     private List<Component> alterTooltip() {
         List<Component> text = Lists.newArrayList();
-        if (this.minecraft == null || this.minecraft.level == null) return text;
+        if (this.minecraft.level == null) return text;
         Optional<Holder.Reference.Reference<Enchantment>> optional = this.minecraft.level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(((this.enchants[this.toolTipNumber])));
 
         if (optional.isPresent()) {

@@ -26,13 +26,13 @@ import java.util.stream.Stream;
 public abstract class EnchantmentHelperMixin {
 
     @Shadow
-    private static DataComponentType<ItemEnchantments> getComponentType(ItemStack stack) {
+    public static DataComponentType<ItemEnchantments> getComponentType(ItemStack itemStack) {
         return null;
     }
 
     @Inject(method = "setEnchantments", at = @At("HEAD"), cancellable = true)
-    private static void enchantmentCap(ItemStack stack, ItemEnchantments enchantments, CallbackInfo ci) {
-        int maxEnchants = Objects.requireNonNull(stack.getComponents().get(DataComponents.ENCHANTABLE)).value();
+    private static void enchantmentCap(ItemStack itemStack, ItemEnchantments enchantments, CallbackInfo ci) {
+        int maxEnchants = Objects.requireNonNull(itemStack.getComponents().get(DataComponents.ENCHANTABLE)).value();
         int currentEnchants = 0;
         ItemEnchantments.Mutable newComponentBuilder = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
 
@@ -43,14 +43,16 @@ public abstract class EnchantmentHelperMixin {
                 currentEnchants += enchantLevel;
             }
         }
-        stack.set(getComponentType(stack), newComponentBuilder.toImmutable());
+
+        itemStack.set(Objects.requireNonNull(getComponentType(itemStack)), newComponentBuilder.toImmutable());
+
         ci.cancel();
     }
 
     @Inject(method = "selectEnchantment", at = @At("RETURN"), cancellable = true)
-    private static void capEnchantmentList(RandomSource random, ItemStack stack, int level, Stream<Holder<Enchantment>> possibleEnchantments, CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
+    private static void capEnchantmentList(RandomSource random, ItemStack itemStack, int enchantmentCost, Stream<Holder<Enchantment>> source, CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
         List<EnchantmentInstance> returnList = cir.getReturnValue();
-        int enchantability = Objects.requireNonNull(stack.getComponents().get(DataComponents.ENCHANTABLE)).value();
+        int enchantability = Objects.requireNonNull(itemStack.getComponents().get(DataComponents.ENCHANTABLE)).value();
         cir.setReturnValue(BalancedEnchantmentHelper.cutEnchantmentList(returnList, enchantability));
     }
 

@@ -37,7 +37,7 @@ public class EnchantabilityMixin {
 
     @Inject(method = "registerItem(Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Function;Lnet/minecraft/world/item/Item$Properties;)Lnet/minecraft/world/item/Item;", at = @At("HEAD"))
     private static void register3(ResourceKey<Item> key, Function<Item.Properties, Item> factory, Item.Properties settings, CallbackInfoReturnable<Item> cir){
-        addEnchantability(key.location().getNamespace(), settings);
+        addEnchantability(key.identifier().getNamespace(), settings);
     }
 
     @Unique

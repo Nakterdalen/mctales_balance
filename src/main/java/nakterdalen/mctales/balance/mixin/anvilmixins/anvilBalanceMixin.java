@@ -38,6 +38,7 @@ public abstract class anvilBalanceMixin extends ItemCombinerMenu {
     public anvilBalanceMixin(@Nullable MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess context, ItemCombinerMenuSlotDefinition forgingSlotsManager) {
         super(type, syncId, playerInventory, context, forgingSlotsManager);
     }
+    
 
     @Redirect(method = "createResult", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;setDamageValue(I)V", ordinal = 0))
     private void changeDurability(ItemStack instance, int damage) {
