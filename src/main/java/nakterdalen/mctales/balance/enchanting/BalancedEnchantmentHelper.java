@@ -51,7 +51,7 @@ public class BalancedEnchantmentHelper {
         int totalLevel = 1;
         while (totalLevel < level) {
             List<Float> probList = new LinkedList<>();
-            enchantList.forEach((entry) ->probList.add(random.nextFloat()));
+            enchantList.forEach( _ -> probList.add(random.nextFloat()));
             boolean hasAdded = false;
             for (int i = 0; i < enchantList.size(); i++) {
                 float probIncrease = stack.is(Items.BOOK) ? HIGHERLEVELBOOKCHANCE : HIGHERLEVELCHANCE;
