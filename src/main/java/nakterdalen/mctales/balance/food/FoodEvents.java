@@ -5,16 +5,9 @@ import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.Consumable;
-import net.minecraft.world.item.component.Consumables;
-
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 public class FoodEvents {
@@ -39,15 +32,14 @@ public class FoodEvents {
             ((IFoodManager)newPlayer).balance$setFoodManager(newManager);
         });
 
-        DefaultItemComponentEvents.MODIFY.register( mod -> {
-            mod.modify(FoodEvents::isChangedFood,(builder, provider, item) -> {
-                BalancedFoodItems balancedFood = BalancedFoodItems.getBalancedFoodItem(item.toString());
-                builder.set(DataComponents.CONSUMABLE,
-                        BalancedFoodHelper.copyFoodBuilder(Objects.requireNonNull(item.components().get(DataComponents.CONSUMABLE)))
-                                .consumeSeconds(balancedFood.getEatSeconds()).build());
-                builder.set(DataComponents.MAX_STACK_SIZE, balancedFood.getStackSize());
-            });
-        });
+        DefaultItemComponentEvents.MODIFY.register( mod ->
+                mod.modify(FoodEvents::isChangedFood,(builder, _, item) -> {
+            BalancedFoodItems balancedFood = BalancedFoodItems.getBalancedFoodItem(item.toString());
+            builder.set(DataComponents.CONSUMABLE,
+                    BalancedFoodHelper.copyFoodBuilder(Objects.requireNonNull(item.components().get(DataComponents.CONSUMABLE)))
+                            .consumeSeconds(balancedFood.getEatSeconds()).build());
+            builder.set(DataComponents.MAX_STACK_SIZE, balancedFood.getStackSize());
+        }));
     }
 
     private static boolean isChangedFood(Item item) {

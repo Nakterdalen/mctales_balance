@@ -5,7 +5,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.consume_effects.ConsumeEffect;
-import net.minecraft.world.level.Level;
 
 import java.util.List;
 
