@@ -12,6 +12,8 @@
     "enchantingmixins.ExperienceLevelMixin",
     "enchantingmixins.MendingMixin",
     "enchantingmixins.ZombieFireSpreadMixin",
+    "foodmixins.FoodItemMixin",
+    "foodmixins.FoodPlayerMixin",
     "foodmixins.FoodSaverMixin",
     "gearprogressionmixins.ItemMaterialMixin",
     "gearprogressionmixins.ToolMaterialMixin"

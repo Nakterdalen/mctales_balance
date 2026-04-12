@@ -77,8 +77,20 @@ public class BalancedFoodManager {
     }
 
     public void decrementHunger() {
-        this.hungerBar.removeFirst();
-        this.hungerBar.addLast(FoodType.NONE);
+        hungerBar.removeIf(t -> t.equals(BalancedFoodManager.FoodType.NONE));
+        hungerBar.removeFirst();
+        while (hungerBar.size() < 10) hungerBar.addFirst(FoodType.NONE);
+    }
+
+    public void addFoodValue(BalancedFoodItems item) {
+        hungerBar.removeIf(t -> t.equals(BalancedFoodManager.FoodType.NONE));
+        hungerBar.addAll(item.getFoodValue());
+
+        if (hungerBar.size() > 10) {
+            hungerBar = hungerBar.subList(0,10);
+        } else {
+            while (hungerBar.size() < 10) hungerBar.addFirst(BalancedFoodManager.FoodType.NONE);
+        }
     }
 
     public void addExhaustion(float value, FoodType type) {
@@ -91,12 +103,12 @@ public class BalancedFoodManager {
         return this.exhaustion;
     }
 
-    public List<FoodType> getHungerBar() {
-        return this.hungerBar;
+    public boolean canEat() {
+        return this.hungerBar.stream().anyMatch(type -> type.equals(FoodType.NONE));
     }
 
-    public void setHungerBar(List<FoodType> hungerBar) {
-        this.hungerBar = hungerBar;
+    public List<FoodType> getHungerBar() {
+        return this.hungerBar;
     }
 
     private byte[] getByteHunger() {
@@ -153,7 +165,7 @@ public class BalancedFoodManager {
         }
 
         //Printing for now
-        if (player.tickCount % 20 == 0) {
+        if (player.tickCount % 40 == 0) {
             System.out.println("Exhaustion: " +  this.getExhaustion());
             System.out.print("Bars: ");
             this.getHungerBar().forEach(bar -> System.out.print(" " + bar.toString()));
@@ -176,17 +188,21 @@ public class BalancedFoodManager {
     }
 
     public enum FoodWeight {
-        SMALL(10),
-        MEDIUM(20),
-        LARGE(30);
+        SMALL(0.8f, 32),
+        MEDIUM(1.6f, 16),
+        LARGE(3.2f, 8),
+        POTION(0.8f, 8);
 
-        final int eatingTime;
+        private final float eatingTime;
+        private final int stackSize;
 
-        FoodWeight(int eatingTime) {
+        FoodWeight(float eatingTime, int stackSize) {
             this.eatingTime = eatingTime;
+            this.stackSize = stackSize;
         }
 
-        public int getEatingTime() {return eatingTime;}
+        public float getEatingTime() {return eatingTime;}
+        public int getStackSize() {return stackSize;}
     }
 
 }

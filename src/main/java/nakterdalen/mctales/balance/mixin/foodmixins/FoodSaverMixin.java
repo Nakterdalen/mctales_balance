@@ -94,6 +94,10 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
         }
     }
 
+    public boolean balance$canEat() {
+        return this.manager.canEat();
+    }
+
     public void balance$setFoodManager(BalancedFoodManager manager) {
         this.manager = manager;
     }

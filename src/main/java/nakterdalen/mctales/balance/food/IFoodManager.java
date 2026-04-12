@@ -10,4 +10,6 @@ public interface IFoodManager {
 
     void balance$setFoodManager(BalancedFoodManager manager);
 
+    boolean balance$canEat();
+
 }
