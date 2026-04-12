@@ -3,7 +3,6 @@ package nakterdalen.mctales.balance.food;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import io.netty.buffer.ByteBuf;
@@ -15,7 +14,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
@@ -121,11 +119,10 @@ public class BalancedFoodManager {
     );
 
     public static final AttachmentType<BalancedFoodManager> FOOD_ATTACHMENT = AttachmentRegistry.create(
-            Identifier.fromNamespaceAndPath(MinecraftTalesBalance.MOD_ID, "food_attachment"), builder -> {
-                builder.initializer(BalancedFoodManager::new)
-                        .syncWith(STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
-                        .persistent(CODEC);
-            }
+            Identifier.fromNamespaceAndPath(MinecraftTalesBalance.MOD_ID, "food_attachment"), builder ->
+                    builder.initializer(BalancedFoodManager::new)
+                    .syncWith(STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+                    .persistent(CODEC)
     );
 
     public void foodTick(Player player) {
