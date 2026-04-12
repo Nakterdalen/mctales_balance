@@ -1,6 +1,7 @@
 package nakterdalen.mctales.balance;
 
 import nakterdalen.mctales.balance.armor.WeightEvents;
+import nakterdalen.mctales.balance.food.FoodEvents;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ public class MinecraftTalesBalance implements ModInitializer {
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
         WeightEvents.registerWeightEvents();
+        FoodEvents.registerMineFoodEvent();
 
         LOGGER.info("Hello balanced world!");
     }
