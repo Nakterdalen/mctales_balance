@@ -1,7 +1,6 @@
 package nakterdalen.mctales.balance;
 
 import nakterdalen.mctales.balance.armor.WeightEvents;
-import nakterdalen.mctales.balance.food.BalancedFoodHelper;
 import nakterdalen.mctales.balance.food.BalancedFoodManager;
 import nakterdalen.mctales.balance.food.FoodEvents;
 import net.fabricmc.api.ModInitializer;
