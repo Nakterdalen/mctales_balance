@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "EnchantmentScreenMixin",
-    "ExampleClientMixin"
+    "ExampleClientMixin",
+    "ClientFoodMixin"
   ],
   "injectors": {
     "defaultRequire": 1

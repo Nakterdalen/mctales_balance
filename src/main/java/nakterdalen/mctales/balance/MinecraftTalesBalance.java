@@ -1,8 +1,11 @@
 package nakterdalen.mctales.balance;
 
 import nakterdalen.mctales.balance.armor.WeightEvents;
+import nakterdalen.mctales.balance.food.BalancedFoodHelper;
+import nakterdalen.mctales.balance.food.BalancedFoodManager;
 import nakterdalen.mctales.balance.food.FoodEvents;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +24,8 @@ public class MinecraftTalesBalance implements ModInitializer {
         // Proceed with mild caution.
         WeightEvents.registerWeightEvents();
         FoodEvents.registerMineFoodEvent();
+
+        PayloadTypeRegistry.clientboundPlay().register(BalancedFoodManager.TYPE, BalancedFoodManager.STREAM_CODEC);
 
         LOGGER.info("Hello balanced world!");
     }

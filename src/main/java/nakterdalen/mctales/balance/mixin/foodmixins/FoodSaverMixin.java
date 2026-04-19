@@ -17,11 +17,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+
 @Mixin(ServerPlayer.class)
 public abstract class FoodSaverMixin extends Player implements IFoodManager {
 
     @Unique
     BalancedFoodManager manager;
+
+    @Unique
+    private boolean dataChanged = false;
 
     public FoodSaverMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
@@ -69,13 +73,17 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
     @Redirect(method = "doTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;tick(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private void hungerTick(FoodData instance, ServerPlayer player) {
 
+        // Sync food data
+        if (this.tickCount % 10 == 0 && dataChanged) {
+            this.setAttached(BalancedFoodManager.FOOD_ATTACHMENT, new BalancedFoodManager(manager));
+            dataChanged = false;
+        }
+
         if (this.foodData.needsFood()) {
             this.foodData.setFoodLevel(instance.getFoodLevel() + 1);
         }
         manager.foodTick(this);
     }
-
-    //fix sprinting in client.
 
     //Mining, attacking. Handled through event in different class
     public void balance$mineHunger() {
@@ -87,10 +95,12 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
         return this.manager.canRun();
     }
 
+    // adds exhaustion and sends a syncing packet
     @Unique
     private void addExhaustion(float value, BalancedFoodManager.FoodType type) {
         if (!this.isInvulnerable() && this.level().getDifficulty() != Difficulty.PEACEFUL && !this.level().isClientSide()) {
             this.manager.addExhaustion(value, type);
+            this.dataChanged = true;
         }
     }
 

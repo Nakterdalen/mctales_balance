@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
@@ -20,7 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.gamerules.GameRules;
 import org.jspecify.annotations.NonNull;
 
-public class BalancedFoodManager {
+public class BalancedFoodManager implements CustomPacketPayload{
 
     private List<FoodType> hungerBar = new ArrayList<>();
     private float exhaustion;
@@ -31,6 +32,11 @@ public class BalancedFoodManager {
         for (int i = 0; i < 10; i++) {
             hungerBar.add(FoodType.MEAT);
         }
+    }
+
+    public BalancedFoodManager(BalancedFoodManager manager) {
+        this(manager.getHungerBar(), manager.getExhaustion());
+        this.tickTimer = 0;
     }
 
     public BalancedFoodManager(List<FoodType> hungerBar, float exhaustion) {
@@ -107,8 +113,8 @@ public class BalancedFoodManager {
         return this.hungerBar.stream().anyMatch(type -> type.equals(FoodType.NONE));
     }
 
-    public List<FoodType> getHungerBar() {
-        return this.hungerBar;
+    public ArrayList<FoodType> getHungerBar() {
+        return new ArrayList<>(hungerBar);
     }
 
     private byte[] getByteHunger() {
@@ -120,7 +126,10 @@ public class BalancedFoodManager {
     }
 
     public static final Codec<BalancedFoodManager> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            FoodType.CODEC.listOf().fieldOf("food_types").forGetter(BalancedFoodManager::getHungerBar),
+            FoodType.CODEC.listOf().fieldOf("food_types").xmap(
+                    ArrayList::new,
+                            t -> t)
+                    .forGetter(BalancedFoodManager::getHungerBar),
             Codec.floatRange(0, 20).fieldOf("exhaustion").forGetter(BalancedFoodManager::getExhaustion)
     ).apply(instance, BalancedFoodManager::new));
 
@@ -137,7 +146,11 @@ public class BalancedFoodManager {
                     .persistent(CODEC)
     );
 
+    public static final CustomPacketPayload.Type<BalancedFoodManager> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(MinecraftTalesBalance.MOD_ID, "food_packet"));
+
     public void foodTick(Player player) {
+
+        if (player.isLocalPlayer()) return;
 
         if (this.exhaustion > 20.0f) {
             resetExhaustion();
@@ -171,6 +184,11 @@ public class BalancedFoodManager {
             this.getHungerBar().forEach(bar -> System.out.print(" " + bar.toString()));
             System.out.println(" ");
         }
+    }
+
+    @Override
+    public @NonNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public enum FoodType implements StringRepresentable{
