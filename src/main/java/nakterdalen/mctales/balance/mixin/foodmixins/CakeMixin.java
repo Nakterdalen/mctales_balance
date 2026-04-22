@@ -2,7 +2,6 @@ package nakterdalen.mctales.balance.mixin.foodmixins;
 
 import nakterdalen.mctales.balance.food.IFoodManager;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;

@@ -5,8 +5,6 @@ import nakterdalen.mctales.balance.food.BalancedFoodManager;
 import nakterdalen.mctales.balance.food.FoodEvents;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.network.ServerPlayerConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

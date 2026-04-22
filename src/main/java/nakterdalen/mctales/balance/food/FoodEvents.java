@@ -42,14 +42,11 @@ public class FoodEvents {
             builder.set(DataComponents.MAX_STACK_SIZE, balancedFood.getStackSize());
         }));
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+        ServerPlayConnectionEvents.JOIN.register((handler, _, _) ->
+                ((IFoodManager)handler.player).balance$createFoodData());
 
-            ((IFoodManager)handler.player).balance$createFoodData();
-        });
-
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
-            ((IFoodManager)handler.player).balance$saveFoodData();
-        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, _) ->
+                ((IFoodManager)handler.player).balance$saveFoodData());
     }
 
     private static boolean isChangedFood(Item item) {
