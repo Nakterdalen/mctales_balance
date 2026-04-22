@@ -30,7 +30,7 @@ public class BalancedFoodHelper {
             BalancedFoodManager manager = ((IFoodManager)entity).balance$getFoodManager();
             BalancedFoodItems item = BalancedFoodItems.getBalancedFoodItem(itemStack.toString());
             manager.addFoodValue(item);
-            manager.resetExhaustion();
+            ((IFoodManager)entity).balance$markDirtyFood();
         }
     }
 

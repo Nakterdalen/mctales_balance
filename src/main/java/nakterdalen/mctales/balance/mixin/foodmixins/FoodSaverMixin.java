@@ -1,15 +1,12 @@
 package nakterdalen.mctales.balance.mixin.foodmixins;
 
-
 import com.mojang.authlib.GameProfile;
 import nakterdalen.mctales.balance.food.BalancedFoodManager;
 import nakterdalen.mctales.balance.food.IFoodManager;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,48 +22,37 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
     BalancedFoodManager manager;
 
     @Unique
-    private boolean dataChanged = false;
+    private boolean dataChanged = true;
 
     public FoodSaverMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
     }
 
-    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    private void checkFoodManager(CallbackInfo ci) {
-        if (!this.hasAttached(BalancedFoodManager.FOOD_ATTACHMENT)) {
-            this.setAttached(BalancedFoodManager.FOOD_ATTACHMENT, new BalancedFoodManager());
-        }
-        manager = this.getAttached(BalancedFoodManager.FOOD_ATTACHMENT);
-    }
-
-    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    private void saveFoodManager(ValueOutput output, CallbackInfo ci) {
-        this.setAttached(BalancedFoodManager.FOOD_ATTACHMENT, manager);
-    }
 
     //Movement
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;causeFoodExhaustion(F)V"))
     private void movementHunger(double dx, double dy, double dz, CallbackInfo ci) {
         int distance = Math.round((float)Math.sqrt(dx * dx + dy * dy + dz * dz) * 100.0F);
-        addExhaustion(0.01f * distance * 0.01f, BalancedFoodManager.FoodType.GRAIN);
+        manager.addExhaustion(0.01f * distance * 0.01f, BalancedFoodManager.FoodType.GRAIN, this, 0.01f);
+        this.dataChanged = true;
     }
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;causeFoodExhaustion(F)V", ordinal = 5))
     private void movementHungerWalk(double dx, double dy, double dz, CallbackInfo ci) {
         int distance = Math.round((float)Math.sqrt(dx * dx + dy * dy + dz * dz) * 100.0F);
-        addExhaustion(-0.005f * distance * 0.01f, BalancedFoodManager.FoodType.GRAIN);
+        manager.addExhaustion(-0.005f * distance * 0.01f, BalancedFoodManager.FoodType.GRAIN, this, 0f);
+        this.dataChanged = true;
     }
     @Inject(method = "checkMovementStatistics", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;causeFoodExhaustion(F)V", ordinal = 4))
     private void movementHungerCrouch(double dx, double dy, double dz, CallbackInfo ci) {
         int distance = Math.round((float)Math.sqrt(dx * dx + dy * dy + dz * dz) * 100.0F);
-        addExhaustion(-0.01f * distance * 0.01f, BalancedFoodManager.FoodType.GRAIN);
+        manager.addExhaustion(-0.01f * distance * 0.01f, BalancedFoodManager.FoodType.GRAIN, this, 0f);
+        this.dataChanged = true;
     }
     @Inject(method = "jumpFromGround", at = @At(value = "TAIL"))
     private void jumpHunger(CallbackInfo ci) {
-        if (this.isSprinting()) {
-            addExhaustion(0.2F, BalancedFoodManager.FoodType.GRAIN);
-        } else {
-            addExhaustion(0.05F, BalancedFoodManager.FoodType.GRAIN);
-        }
+        float jumpCost = this.isSprinting() ? 0.2f : 0.05f;
+        manager.addExhaustion(jumpCost, BalancedFoodManager.FoodType.GRAIN, this);
+        this.dataChanged = true;
     }
 
     //tick
@@ -74,7 +60,7 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
     private void hungerTick(FoodData instance, ServerPlayer player) {
 
         // Sync food data
-        if (this.tickCount % 10 == 0 && dataChanged) {
+        if (this.tickCount % 5 == 0 && dataChanged) {
             this.setAttached(BalancedFoodManager.FOOD_ATTACHMENT, new BalancedFoodManager(manager));
             dataChanged = false;
         }
@@ -82,26 +68,18 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
         if (this.foodData.needsFood()) {
             this.foodData.setFoodLevel(instance.getFoodLevel() + 1);
         }
+
         manager.foodTick(this);
     }
 
     //Mining, attacking. Handled through event in different class
     public void balance$mineHunger() {
-        this.addExhaustion(0.1F,  BalancedFoodManager.FoodType.VEGETABLE);
+        manager.addExhaustion(0.1F,  BalancedFoodManager.FoodType.VEGETABLE, this);
+        this.dataChanged = true;
     }
 
-    //Can run. Injection in different class
-    public boolean balance$canRun() {
-        return this.manager.canRun();
-    }
-
-    // adds exhaustion and sends a syncing packet
-    @Unique
-    private void addExhaustion(float value, BalancedFoodManager.FoodType type) {
-        if (!this.isInvulnerable() && this.level().getDifficulty() != Difficulty.PEACEFUL && !this.level().isClientSide()) {
-            this.manager.addExhaustion(value, type);
-            this.dataChanged = true;
-        }
+    public void balance$markDirtyFood() {
+        this.dataChanged =  true;
     }
 
     public boolean balance$canEat() {
@@ -115,5 +93,20 @@ public abstract class FoodSaverMixin extends Player implements IFoodManager {
     @Override
     public BalancedFoodManager balance$getFoodManager() {
         return this.manager;
+    }
+
+    public void balance$regenHunger() {
+        manager.addExhaustion(1.0f, BalancedFoodManager.FoodType.MEAT, this);
+    }
+
+    public void balance$createFoodData() {
+        if (!this.hasAttached(BalancedFoodManager.FOOD_ATTACHMENT)) {
+            this.setAttached(BalancedFoodManager.FOOD_ATTACHMENT, new BalancedFoodManager());
+        }
+        manager = this.getAttached(BalancedFoodManager.FOOD_ATTACHMENT);
+    }
+
+    public void balance$saveFoodData() {
+        this.setAttached(BalancedFoodManager.FOOD_ATTACHMENT, new BalancedFoodManager(manager));
     }
 }

@@ -2,8 +2,8 @@ package nakterdalen.mctales.balance.food;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 import io.netty.buffer.ByteBuf;
 import nakterdalen.mctales.balance.MinecraftTalesBalance;
@@ -17,6 +17,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.gamerules.GameRules;
 import org.jspecify.annotations.NonNull;
@@ -25,35 +26,32 @@ public class BalancedFoodManager implements CustomPacketPayload{
 
     private List<FoodType> hungerBar = new ArrayList<>();
     private float exhaustion;
+    private FoodType lastFoodType;
     private int tickTimer = 0;
 
     public BalancedFoodManager() {
         exhaustion = 0f;
-        for (int i = 0; i < 10; i++) {
-            hungerBar.add(FoodType.MEAT);
-        }
+        hungerBar.addAll(Collections.nCopies(10, FoodType.MEAT));
+        lastFoodType = FoodType.NONE;
     }
 
     public BalancedFoodManager(BalancedFoodManager manager) {
-        this(manager.getHungerBar(), manager.getExhaustion());
+        this(manager.getHungerBar(), manager.getExhaustion(), manager.getLastFoodType());
         this.tickTimer = 0;
     }
 
-    public BalancedFoodManager(List<FoodType> hungerBar, float exhaustion) {
+    public BalancedFoodManager(List<FoodType> hungerBar, float exhaustion,  FoodType lastFoodType) {
         this.hungerBar = hungerBar;
         this.exhaustion = exhaustion;
+        this.lastFoodType = lastFoodType;
     }
 
-    private BalancedFoodManager(float exhaustion, byte[] hungerArray) {
+    private BalancedFoodManager(float exhaustion, byte[] hungerArray, byte foodType) {
         ArrayList<FoodType> list = new ArrayList<>();
         for (byte b : hungerArray) {
             list.add(FoodType.values()[b]);
         }
-        this(list, exhaustion);
-    }
-
-    private void incExhaustion(float value) {
-        this.exhaustion += value;
+        this(list, exhaustion, FoodType.values()[foodType]);
     }
 
     public void resetExhaustion() {
@@ -69,7 +67,7 @@ public class BalancedFoodManager implements CustomPacketPayload{
             default -> 20;
         };
 
-        return health < mapDiff && emptyBar;
+        return (health > mapDiff) && emptyBar;
     }
 
     public boolean willHeal() {
@@ -79,7 +77,7 @@ public class BalancedFoodManager implements CustomPacketPayload{
 
     public boolean canRun() {
         long fullBars = this.hungerBar.stream().filter(type -> !type.equals(FoodType.NONE)).count();
-        return fullBars >= 3;
+        return fullBars > 3;
     }
 
     public void decrementHunger() {
@@ -93,24 +91,56 @@ public class BalancedFoodManager implements CustomPacketPayload{
         hungerBar.addAll(item.getFoodValue());
 
         if (hungerBar.size() > 10) {
-            hungerBar = hungerBar.subList(0,10);
+            hungerBar = exhaustion > 10f ? hungerBar.subList(1,11) :  hungerBar.subList(0, 10);
+            resetExhaustion();
         } else {
             while (hungerBar.size() < 10) hungerBar.addFirst(BalancedFoodManager.FoodType.NONE);
         }
     }
 
-    public void addExhaustion(float value, FoodType type) {
-        long numberInList = this.hungerBar.stream().filter(f -> f == type).count();
-        float reduction = 1 - (float)(numberInList / 10) * 0.8f;
-        incExhaustion(value * reduction * 20);
+    public void eatCake(float chance) {
+        if (chance < 0.3f) {
+            addFoodValue(BalancedFoodItems.CAKE_MEAT);
+        } else {
+            addFoodValue(BalancedFoodItems.CAKE_GRAIN);
+        }
+    }
+
+    public void addExhaustion(float value, FoodType type, Player player) {
+        addExhaustion(value, type, player, 1f);
+    }
+
+    public void addExhaustion(float value, FoodType type, Player player, float chance) {
+        if (!player.isCreative() && !player.isSpectator() && player.level().getDifficulty() != Difficulty.PEACEFUL && !player.level().isClientSide()) {
+            long numberInList = this.hungerBar.stream().filter(f -> f == type).count();
+            float reduction = 1 - (float)(numberInList / 10) * 0.8f;
+            int hungerPenalty = !player.hasEffect(MobEffects.HUNGER) ? 1 :
+                    (Objects.requireNonNull(player.getEffect(MobEffects.HUNGER)).getAmplifier() + 1) * 20;
+            this.exhaustion += value * reduction * hungerPenalty;
+            if (chance >= player.getRandom().nextFloat()) {
+                updateLastFoodType(type);
+            }
+        }
     }
 
     public float getExhaustion() {
         return this.exhaustion;
     }
 
+    public FoodType getLastFoodType() {
+        return this.lastFoodType;
+    }
+
+    public byte getLastByteType() {
+        return (byte)this.lastFoodType.ordinal();
+    }
+
     public boolean canEat() {
         return this.hungerBar.stream().anyMatch(type -> type.equals(FoodType.NONE));
+    }
+
+    public void updateLastFoodType(FoodType foodType) {
+        this.lastFoodType = foodType;
     }
 
     public ArrayList<FoodType> getHungerBar() {
@@ -130,12 +160,14 @@ public class BalancedFoodManager implements CustomPacketPayload{
                     ArrayList::new,
                             t -> t)
                     .forGetter(BalancedFoodManager::getHungerBar),
-            Codec.floatRange(0, 20).fieldOf("exhaustion").forGetter(BalancedFoodManager::getExhaustion)
+            Codec.floatRange(0, 20).fieldOf("exhaustion").forGetter(BalancedFoodManager::getExhaustion),
+            FoodType.CODEC.orElse(FoodType.NONE).fieldOf("last_food_type").forGetter(BalancedFoodManager::getLastFoodType)
     ).apply(instance, BalancedFoodManager::new));
 
     public static final StreamCodec<ByteBuf, BalancedFoodManager> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.FLOAT, BalancedFoodManager::getExhaustion,
             ByteBufCodecs.BYTE_ARRAY, BalancedFoodManager::getByteHunger,
+            ByteBufCodecs.BYTE, BalancedFoodManager::getLastByteType,
             BalancedFoodManager::new
     );
 
@@ -162,17 +194,18 @@ public class BalancedFoodManager implements CustomPacketPayload{
         boolean naturalRegen = level.getGameRules().get(GameRules.NATURAL_HEALTH_REGENERATION);
         if (!player.isCreative() && naturalRegen && player.isHurt() && willHeal()) {
             this.tickTimer++;
-            if (this.tickTimer == 200) {
+            int regenDiscount = 100 * (lastFoodType.equals(FoodType.MEAT) ? 1 : 0);
+            if (this.tickTimer == 150 - regenDiscount) {
                 player.heal(1.0f);
-                addExhaustion(1.0f, BalancedFoodManager.FoodType.MEAT);
+                ((IFoodManager)player).balance$regenHunger();
                 this.tickTimer = 0;
             }
         } else if (this.willStarve(player.getHealth(), player.level().getDifficulty())) {
             this.tickTimer++;
             if (this.tickTimer == 80) {
                 player.hurtServer(level, player.damageSources().starve(), 1.0F);
+                this.tickTimer = 0;
             }
-            this.tickTimer = 0;
         } else {
             this.tickTimer = 0;
         }
@@ -182,7 +215,7 @@ public class BalancedFoodManager implements CustomPacketPayload{
             System.out.println("Exhaustion: " +  this.getExhaustion());
             System.out.print("Bars: ");
             this.getHungerBar().forEach(bar -> System.out.print(" " + bar.toString()));
-            System.out.println(" ");
+            System.out.println(" lastType: " + this.lastFoodType.toString());
         }
     }
 

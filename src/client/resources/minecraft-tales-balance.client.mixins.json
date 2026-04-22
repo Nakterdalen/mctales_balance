@@ -3,11 +3,12 @@
   "package": "nakterdalen.mctales.balance.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "ClientFoodMixin",
     "EnchantmentScreenMixin",
     "ExampleClientMixin",
-    "ClientFoodMixin"
+    "FoodBarMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }

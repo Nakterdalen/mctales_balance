@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -40,6 +41,15 @@ public class FoodEvents {
                             .consumeSeconds(balancedFood.getEatSeconds()).build());
             builder.set(DataComponents.MAX_STACK_SIZE, balancedFood.getStackSize());
         }));
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+
+            ((IFoodManager)handler.player).balance$createFoodData();
+        });
+
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, sender) -> {
+            ((IFoodManager)handler.player).balance$saveFoodData();
+        });
     }
 
     private static boolean isChangedFood(Item item) {

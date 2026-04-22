@@ -6,10 +6,16 @@ public interface IFoodManager {
 
     void balance$mineHunger();
 
-    boolean balance$canRun();
+    void balance$regenHunger();
 
     void balance$setFoodManager(BalancedFoodManager manager);
 
     boolean balance$canEat();
+
+    void balance$markDirtyFood();
+
+    void balance$createFoodData();
+
+    void balance$saveFoodData();
 
 }

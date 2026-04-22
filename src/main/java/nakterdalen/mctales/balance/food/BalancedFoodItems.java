@@ -7,12 +7,14 @@ import java.util.List;
 
 public enum BalancedFoodItems {
 
-    APPLE(BalancedFoodManager.FoodType.GRAIN, 2, BalancedFoodManager.FoodWeight.MEDIUM),
+    APPLE(BalancedFoodManager.FoodType.VEGETABLE, 2, BalancedFoodManager.FoodWeight.MEDIUM),
     BAKED_POTATO(BalancedFoodManager.FoodType.VEGETABLE, 3, BalancedFoodManager.FoodWeight.MEDIUM),
     BEETROOT(BalancedFoodManager.FoodType.VEGETABLE, 1, BalancedFoodManager.FoodWeight.MEDIUM),
     BEETROOT_SOUP(BalancedFoodManager.FoodType.VEGETABLE, 6, BalancedFoodManager.FoodWeight.MEDIUM),
     BREAD(BalancedFoodManager.FoodType.GRAIN, 3, BalancedFoodManager.FoodWeight.MEDIUM),
     CARROT(BalancedFoodManager.FoodType.VEGETABLE, 2, BalancedFoodManager.FoodWeight.MEDIUM),
+    CAKE_MEAT(BalancedFoodManager.FoodType.MEAT, 1, BalancedFoodManager.FoodWeight.SMALL),
+    CAKE_GRAIN(BalancedFoodManager.FoodType.GRAIN, 1, BalancedFoodManager.FoodWeight.SMALL),
     CHORUS_FRUIT(BalancedFoodManager.FoodType.VEGETABLE, 2, BalancedFoodManager.FoodWeight.MEDIUM),
     COOKED_CHICKEN(BalancedFoodManager.FoodType.MEAT, 3, BalancedFoodManager.FoodWeight.MEDIUM),
     COOKED_COD(BalancedFoodManager.FoodType.MEAT, 3, BalancedFoodManager.FoodWeight.MEDIUM),

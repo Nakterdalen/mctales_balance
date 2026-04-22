@@ -40,7 +40,7 @@ public class ItemMaterialMixin {
         if (material.equals(ToolMaterial.NETHERITE)) {
             return new Item.Properties().spear(material, attackDuration, 1.075F, delay, dismountTime, dismountThreshold, knockbackTime, knockbackThreshold, damageTime, damageThreshold).fireResistant();
         }
-        return instance;
+        return instance.spear(material, attackDuration, damageMultiplier, delay, dismountTime, dismountThreshold, knockbackTime, knockbackThreshold, damageTime, damageThreshold);
     }
 
     @Inject(method = "registerItem(Ljava/lang/String;Ljava/util/function/Function;Lnet/minecraft/world/item/Item$Properties;)Lnet/minecraft/world/item/Item;", at = @At("HEAD"))
