@@ -16,6 +16,7 @@
     "foodmixins.FoodItemMixin",
     "foodmixins.FoodPlayerMixin",
     "foodmixins.FoodSaverMixin",
+    "foodmixins.InstantSaturationMixin",
     "gearprogressionmixins.ItemMaterialMixin",
     "gearprogressionmixins.ToolMaterialMixin"
   ],

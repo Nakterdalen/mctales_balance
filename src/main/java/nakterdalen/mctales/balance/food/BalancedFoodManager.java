@@ -114,6 +114,7 @@ public class BalancedFoodManager implements CustomPacketPayload{
         if (!player.isCreative() && !player.isSpectator() && player.level().getDifficulty() != Difficulty.PEACEFUL && !player.level().isClientSide()) {
             long numberInList = this.hungerBar.stream().filter(f -> f == type).count();
             float reduction = 1 - (float)(numberInList / 10) * 0.8f;
+            reduction = player.hasEffect(MobEffects.SATURATION) ? 0f : reduction;
             int hungerPenalty = !player.hasEffect(MobEffects.HUNGER) ? 1 :
                     (Objects.requireNonNull(player.getEffect(MobEffects.HUNGER)).getAmplifier() + 1) * 20;
             this.exhaustion += value * reduction * hungerPenalty;

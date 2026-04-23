@@ -10,18 +10,22 @@ import java.util.List;
 
 public class BalancedFoodHelper {
 
-    public static Consumable.Builder copyFoodBuilder(Consumable consumable) {
-        Consumable.Builder builder = Consumable.builder();
+    public static Consumable.Builder copyConsumableBuilder(Consumable consumable) {
+        Consumable.Builder builder = copyWithoutEffects(consumable);
 
         List<ConsumeEffect> effects = consumable.onConsumeEffects();
-
         for (ConsumeEffect effect : effects) {
             builder.onConsume(effect);
         }
+
+        return builder;
+    }
+
+    public static Consumable.Builder copyWithoutEffects(Consumable consumable) {
+        Consumable.Builder builder = Consumable.builder();
         builder.animation(consumable.animation());
         builder.sound(consumable.sound());
         builder.hasConsumeParticles(consumable.hasConsumeParticles());
-
         return builder;
     }
 
