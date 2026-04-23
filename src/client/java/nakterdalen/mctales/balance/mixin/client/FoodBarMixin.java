@@ -90,7 +90,10 @@ public abstract class FoodBarMixin {
                 }
                 int x_pos = xRight - (9 - i) * 8 - 9;
                 int y_pos = yLineBase;
-                if (!currentType.equals(manager.getLastFoodType()) && this.tickCount % (manager.getHungerBar().stream().filter(type -> !type.equals(BalancedFoodManager.FoodType.NONE)).count() * 9 + 1) == 0) {
+
+                if (!currentType.equals(manager.getLastFoodType()) &&
+                        this.tickCount % (manager.getHungerBar().stream().filter(type -> !type.equals(BalancedFoodManager.FoodType.NONE)).count() * 9 + 1) == 0 &&
+                        (manager.getExhaustion() > 10f || manager.getHungerBar().stream().anyMatch(type -> type.equals(BalancedFoodManager.FoodType.NONE)))) {
                     y_pos = yLineBase + (this.random.nextInt(3) - 1);
                 }
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, currentId, x_pos, y_pos, 9, 9);

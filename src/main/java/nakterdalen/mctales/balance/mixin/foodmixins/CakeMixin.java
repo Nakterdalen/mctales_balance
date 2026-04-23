@@ -2,6 +2,7 @@ package nakterdalen.mctales.balance.mixin.foodmixins;
 
 import nakterdalen.mctales.balance.food.IFoodManager;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
@@ -25,7 +26,9 @@ public class CakeMixin {
 
     @Inject(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;eat(IF)V"))
     private static void cakeEat(LevelAccessor level, BlockPos pos, BlockState state, Player player, CallbackInfoReturnable<InteractionResult> cir) {
-        ((IFoodManager)player).balance$getFoodManager().eatCake(player.getRandom().nextFloat());
-        ((IFoodManager)player).balance$markDirtyFood();
+        if (player instanceof ServerPlayer) {
+            ((IFoodManager)player).balance$getFoodManager().eatCake(player.getRandom().nextFloat());
+            ((IFoodManager)player).balance$markDirtyFood();
+        }
     }
 }

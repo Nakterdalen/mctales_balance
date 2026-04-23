@@ -1,5 +1,6 @@
 package nakterdalen.mctales.balance.mixin.foodmixins;
 
+import nakterdalen.mctales.balance.food.BalancedFoodManager;
 import nakterdalen.mctales.balance.food.IFoodManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Avatar;
@@ -15,8 +16,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Objects;
+
 @Mixin(Player.class)
-public abstract class FoodPlayerMixin extends Avatar {
+public abstract class FoodPlayerMixin extends Avatar{
 
     @Final
     @Shadow
@@ -31,6 +34,12 @@ public abstract class FoodPlayerMixin extends Avatar {
         Player player = (Player)(Object)this;
         if(player instanceof ServerPlayer) {
             cir.setReturnValue(this.abilities.invulnerable || canAlwaysEat || ((IFoodManager)player).balance$canEat());
+        } else {
+            if (player.hasAttached(BalancedFoodManager.FOOD_ATTACHMENT)) {
+                boolean uglyEat = Objects.requireNonNull(player.getAttached(BalancedFoodManager.FOOD_ATTACHMENT)).canEat();
+                cir.setReturnValue(this.abilities.invulnerable || canAlwaysEat || uglyEat);
+            }
         }
     }
+
 }
