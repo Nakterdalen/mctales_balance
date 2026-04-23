@@ -210,14 +210,6 @@ public class BalancedFoodManager implements CustomPacketPayload{
         } else {
             this.tickTimer = 0;
         }
-
-        //Printing for now
-        if (player.tickCount % 40 == 0) {
-            System.out.println("Exhaustion: " +  this.getExhaustion());
-            System.out.print("Bars: ");
-            this.getHungerBar().forEach(bar -> System.out.print(" " + bar.toString()));
-            System.out.println(" lastType: " + this.lastFoodType.toString());
-        }
     }
 
     @Override
